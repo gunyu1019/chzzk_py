@@ -46,6 +46,16 @@ class ChzzkAPISession(Session):
     ) -> Content[LiveStatus]:
         pass
 
+    @_response_pydantic_model_validation_able
+    @get("/service/v2/channels/{channel_id}/live-detail")
+    @_response_pydantic_model_validation
+    async def live_detail(
+            self,
+            channel_id: Annotated[str, Path]
+    ) -> Content[LiveDetail]:
+        pass
+
+
 
 class NaverGameAPISession(Session):
     def __init__(self):
