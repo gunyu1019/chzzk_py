@@ -17,6 +17,9 @@ class Client:
         self._api_session = ChzzkAPISession(loop=loop)
         self._game_session = NaverGameAPISession(loop=loop)
 
+        if authorization_key is not None and session_key is not None:
+            self.login(authorization_key, session_key)
+
     async def close(self):
         await self._api_session.close()
         await self._game_session.close()
@@ -27,11 +30,11 @@ class Client:
         self._game_session.login(authorization_key, session_key)
 
     async def live_status(self, channel_id: str) -> LiveStatus:
-        res = await self._api_session.live_status(channel_id)
+        res = await self._api_session.live_status(channel_id=channel_id)
         return res.content
 
     async def live_detail(self, channel_id: str) -> LiveDetail:
-        res = await self._api_session.live_detail(channel_id)
+        res = await self._api_session.live_detail(channel_id=channel_id)
         return res.content
 
     async def user(self) -> User:
