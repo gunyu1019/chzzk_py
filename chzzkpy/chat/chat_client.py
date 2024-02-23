@@ -1,11 +1,11 @@
 import asyncio
 import logging
-from typing import Any, Optional
+from typing import Optional, Callable
 
 import aiohttp
 
 from .access_token import AccessToken
-from .enums import ChatCmd, get_enum
+from .gateway import ChzzkWebSocket
 from ..client import Client
 
 _log = logging.getLogger(__name__)
@@ -17,27 +17,22 @@ class ChatClient(Client):
             channel_id: str,
             authorization_key: Optional[str] = None,
             session_key: Optional[str] = None,
-            chat_channel_id: Optional[str] = None
+            chat_channel_id: Optional[str] = None,
+            loop: Optional[asyncio.AbstractEventLoop] = None
     ):
-        super().__init__(authorization_key, session_key)
+        super().__init__(loop=loop, authorization_key=authorization_key, session_key=session_key)
 
         self.chat_channel_id: str = chat_channel_id
         self.channel_id: str = channel_id
         self.access_token: Optional[AccessToken] = None
+        self.user_id: Optional[str] = None
 
-        self._uid: Optional[str] = None
-        self._sid: Optional[str] = None
-
-        self._ws_session = aiohttp.ClientSession()
-        self._connected = False
+        self.ws_session = aiohttp.ClientSession()
         self._closed = False
 
-        self._default = {
-            "cid": self.chat_channel_id,
-            "svcid": "game",
-            "ver": "2"
-        }
-        self.__ws: Optional[aiohttp.ClientWebSocketResponse] = None
+        self._listeners: dict[str, list[asyncio.Future, Callable[..., bool]]] = dict()
+
+        self._gateway: Optional[ChzzkWebSocket] = None
 
     async def _generate_access_token(self) -> AccessToken:
         res = await self._game_session.chat_access_token(channel_id=self.chat_channel_id)
@@ -46,7 +41,7 @@ class ChatClient(Client):
 
     @property
     def is_connected(self) -> bool:
-        return self._connected
+        return self._gateway.connected
 
     @property
     def is_closed(self) -> bool:
@@ -54,74 +49,42 @@ class ChatClient(Client):
 
     async def connect(self, reconnect: bool = True) -> None:
         if self.chat_channel_id is None:
-            status = await self.live_status(self.channel_id)
-            self._default['cid'] = self.chat_channel_id = status.chat_channel_id
+            status = await self.live_status(channel_id=self.channel_id)
+            self.chat_channel_id = status.chat_channel_id
 
         if self._game_session.has_login:
             user = await self.user()
-            self._uid = user.user_id_hash
+            self.user_id = user.user_id_hash
 
-        await self.polling(reconnect)
+        if self.access_token is None:
+            await self._generate_access_token()
+
+        await self.polling()
 
     async def close(self):
-        self._closed = True
-        await self.__ws.close()
+        await self._gateway.socket.close()
+        await self.ws_session.close()
         await super().close()
 
-    async def polling(self, reconnect: bool = True):
-        server_id = abs(sum([ord(x) for x in self.chat_channel_id])) % 9 + 1
-        url = f"wss://kr-ss{server_id}.chat.naver.com/chat"
-
+    async def polling(self):
+        initial_connect = True
+        session_id: Optional[str] = None
         while not self.is_closed:
-            try:
-                await self._generate_access_token()
+            self._gateway = await ChzzkWebSocket.from_client(
+                self,
+                initial=initial_connect,
+                session_id=session_id
+            )
 
-                self.__ws = await self._ws_session.ws_connect(url)
+            if initial_connect or session_id is None:
+                await self._gateway.send_open(
+                    access_token=self.access_token.access_token,
+                    chat_channel_id=self.chat_channel_id,
+                    mode="READ" if self.user_id is None else "SEND",
+                    user_id=self.user_id
+                )
+                session_id = self._gateway.session_id
+            initial_connect = False
 
-                while True:
-                    await self.poll_event()
-            except asyncio.TimeoutError:
-                # disconnect
-                if not reconnect:
-                    await self.close()
-                    return
-
-                if self.is_closed:
-                    return
-
-    async def poll_event(self):
-        try:
-            msg = await asyncio.wait_for(self.__ws.receive(), timeout=30.0)
-            if msg.type is aiohttp.WSMsgType.TEXT:
-                data = await msg.json()
-                await self.receive_message(data)
-        except asyncio.TimeoutError:
-            pass
-
-    async def receive_message(self, data: dict[str, Any]) -> None:
-        cmd: int = data['cmd']
-        body = data.get('bdy')
-
-        cmd_type = get_enum(ChatCmd, cmd)
-
-        if cmd_type == ChatCmd.CONNECTED:
-            self._connected = True
-            self._sid = body['sid']
-        elif cmd_type == ChatCmd.PING:
-            await self._ws_pong()
-        elif (
-                cmd_type == ChatCmd.CHAT or
-                cmd_type == ChatCmd.RECENT_CHAT or
-                cmd_type == ChatCmd.DONATION
-        ):
-            pass
-        elif cmd_type == ChatCmd.NOTICE:
-            pass
-        elif cmd_type == ChatCmd.BLIND:
-            pass
-
-    async def _ws_pong(self):
-        await self.__ws.send_json({
-            'cmd': ChatCmd.PONG,
-            'ver': 2
-        })
+            while True:
+                await self._gateway.poll_event()

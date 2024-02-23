@@ -20,7 +20,7 @@ class LiveStatus(ChzzkModel):
     paid_promotion: bool
     adult: bool
     chat_channel_id: str
-    category_type: str
+    category_type: Optional[str]
     live_category: str
     live_category_value: str
     live_polling_status: Json[LivePollingStatus] = Field(alias='livePollingStatusJson')
