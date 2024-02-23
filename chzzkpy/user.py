@@ -11,7 +11,7 @@ class User(ChzzkModel):
     user_id_hash: Optional[str]
     nickname: Optional[str]
     profile_image_url: Optional[str]
-    penalties: list[Optional[Any]]  # typing: ???
+    penalties: Optional[list[Any]]  # typing: ???
     official_noti_agree: bool
     official_noti_agree_updated_date: Annotated[
         Optional[datetime.datetime],
