@@ -1,20 +1,19 @@
 import asyncio
+import datetime
 import json
 import logging
+import time
 from typing import Any, Callable, Coroutine, Optional, Literal, Self, TYPE_CHECKING
 
 import aiohttp
 
-from .enums import ChatCmd, get_enum
+from .enums import ChatCmd, get_enum, ChatType
+from .error import ConnectionClosed, WebSocketClosure, ReconnectWebsocket
 
 if TYPE_CHECKING:
     from .chat_client import ChatClient
 
 _log = logging.getLogger(__name__)
-
-
-class WebSocketClosure(Exception):
-    pass
 
 
 class ChzzkWebSocket:
@@ -39,7 +38,6 @@ class ChzzkWebSocket:
     async def from_client(
             cls,
             client: "ChatClient",
-            initial: bool = True,
             session_id: Optional[str] = None
     ) -> Self:
         server_id = abs(sum([ord(x) for x in client.chat_channel_id])) % 9 + 1
@@ -47,6 +45,7 @@ class ChzzkWebSocket:
         socket: aiohttp.ClientWebSocketResponse = await client.ws_session.ws_connect(url)
 
         websocket = cls(socket, client.loop)
+        websocket.session_id = session_id
         return websocket
 
     @property
@@ -60,8 +59,13 @@ class ChzzkWebSocket:
     def connected(self) -> bool:
         return self._connected
 
-    async def _hook(self, *args: Any) -> None:
+    async def _hook(self, evnet: ChatCmd, data: dict[str, Any]) -> None:
         pass
+
+    def _can_handle_close(self, code: Optional[int] = None) -> bool:
+        if code is None:
+            code = self.socket.close_code
+        return code != 1000
 
     async def poll_event(self):
         try:
@@ -78,6 +82,12 @@ class ChzzkWebSocket:
         except asyncio.TimeoutError:
             await self.send_ping()
             _log.debug('Timeout receiving packet. Send to ping for keep-alive')
+        except WebSocketClosure:
+            code = self.socket.close_code
+            if self._can_handle_close(code):
+                raise ReconnectWebsocket()
+            else:
+                raise ConnectionClosed(self.socket, code)
 
     async def received_message(self, data: dict[str, Any]) -> None:
         cmd: int = data['cmd']
@@ -91,16 +101,8 @@ class ChzzkWebSocket:
             self.session_id = body['sid']
         elif cmd_type == ChatCmd.PING:
             await self.send_pong()
-        elif (
-                cmd_type == ChatCmd.CHAT or
-                cmd_type == ChatCmd.RECENT_CHAT or
-                cmd_type == ChatCmd.DONATION
-        ):
-            pass
-        elif cmd_type == ChatCmd.NOTICE:
-            pass
-        elif cmd_type == ChatCmd.BLIND:
-            pass
+        else:
+            await self._hook(cmd_type, data)
 
     async def send(self, data: str) -> None:
         _log.debug("Sending data: %s", data)
@@ -139,6 +141,34 @@ class ChzzkWebSocket:
             "cid": chat_channel_id,
             "cmd": ChatCmd.CONNECT,
             "tid": 1
+        }
+        data.update(self.default_body)
+        await self.send_json(data)
+
+    async def send_chat(
+            self,
+            message: str,
+            chat_channel_id: str
+    ):
+        extra: dict[str, Any] = {
+            "chatType": "STREAMING",
+            "emojis": "",
+            "osType": "PC",
+            "streamingChannelId": chat_channel_id
+        }
+
+        data: dict[str, Any] = {
+            "bdy": {
+                "extras": json.dumps(extra),
+                "msg": message,
+                "msgTime": int(time.time() * 1000),
+                "msgTypeCode": ChatType.TEXT
+            },
+            "retry": False,
+            "cmd": ChatCmd.SEND_CHAT,
+            "sid": self.session_id,
+            "cid": chat_channel_id,
+            "tid": 3,
         }
         data.update(self.default_body)
         await self.send_json(data)
