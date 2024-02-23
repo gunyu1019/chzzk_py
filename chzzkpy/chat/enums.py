@@ -1,10 +1,10 @@
-from enum import Enum
+from enum import IntEnum
 from typing import TypeVar, Any
 
 E = TypeVar('E', bound='Enum')
 
 
-class ChatCmd(Enum):
+class ChatCmd(IntEnum):
     PING = 0
     PONG = 10000
     CONNECT = 100
@@ -22,7 +22,7 @@ class ChatCmd(Enum):
     SEND_CHAT = 3101
 
 
-class ChatType(Enum):
+class ChatType(IntEnum):
     TEXT = 1
     IMAGE = 2
     STICKER = 3
