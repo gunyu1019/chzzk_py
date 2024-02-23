@@ -1,6 +1,7 @@
+import asyncio
 import functools
 import inspect
-from typing import Annotated
+from typing import Annotated, Optional
 
 import aiohttp
 from async_client_decorator import Session, get, Path, Query
@@ -55,8 +56,8 @@ def _custom_query_name(oldest_name, replace_name):
 
 
 class ChzzkSession(Session):
-    def __init__(self, base_url: str):
-        super().__init__(base_url=base_url)
+    def __init__(self, base_url: str, loop: Optional[asyncio.AbstractEventLoop] = None):
+        super().__init__(base_url=base_url, loop=loop)
 
         self._authorization_key = None
         self._session_key = None
@@ -98,8 +99,8 @@ class ChzzkSession(Session):
 
 
 class ChzzkAPISession(ChzzkSession):
-    def __init__(self):
-        super().__init__(base_url="https://api.chzzk.naver.com")
+    def __init__(self, loop: Optional[asyncio.AbstractEventLoop] = None):
+        super().__init__(base_url="https://api.chzzk.naver.com", loop=loop)
 
     @_response_pydantic_model_validation_able
     @get("/polling/v2/channels/{channel_id}/live-status")
@@ -121,8 +122,8 @@ class ChzzkAPISession(ChzzkSession):
 
 
 class NaverGameAPISession(ChzzkSession):
-    def __init__(self):
-        super().__init__(base_url="https://comm-api.game.naver.com")
+    def __init__(self, loop: Optional[asyncio.AbstractEventLoop] = None):
+        super().__init__(base_url="https://comm-api.game.naver.com", loop=loop)
 
     @_response_pydantic_model_validation_able
     @ChzzkSession.login_required

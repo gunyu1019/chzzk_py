@@ -1,5 +1,5 @@
 import datetime
-from typing import Literal, Any
+from typing import Literal, Any, Optional
 from pydantic import Field, Json
 from .base_model import ChzzkModel
 
@@ -36,8 +36,8 @@ class LiveDetail(ChzzkModel):
     # Same LiveStatus
     live_id: int
     live_image_url: str
-    default_thumbnail_image_url: str | None
+    default_thumbnail_image_url: Optional[str]
     open_date: datetime.datetime
     close_date: datetime.datetime
     paid_promotion: bool
-    user_adult_status: str | None
+    user_adult_status: Optional[str]

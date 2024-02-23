@@ -1,8 +1,8 @@
-from typing import Any
-
-import aiohttp
 import asyncio
 import logging
+from typing import Any, Optional
+
+import aiohttp
 
 from .access_token import AccessToken
 from .enums import ChatCmd, get_enum
@@ -15,18 +15,18 @@ class ChatClient(Client):
     def __init__(
             self,
             channel_id: str,
-            authorization_key: str = None,
-            session_key: str = None,
-            chat_channel_id: str = None
+            authorization_key: Optional[str] = None,
+            session_key: Optional[str] = None,
+            chat_channel_id: Optional[str] = None
     ):
         super().__init__(authorization_key, session_key)
 
         self.chat_channel_id: str = chat_channel_id
         self.channel_id: str = channel_id
-        self.access_token: AccessToken | None = None
+        self.access_token: Optional[AccessToken] = None
 
-        self._uid: str | None = None
-        self._sid: str | None = None
+        self._uid: Optional[str] = None
+        self._sid: Optional[str] = None
 
         self._ws_session = aiohttp.ClientSession()
         self._connected = False
@@ -37,7 +37,7 @@ class ChatClient(Client):
             "svcid": "game",
             "ver": "2"
         }
-        self.__ws: aiohttp.ClientWebSocketResponse | None = None
+        self.__ws: Optional[aiohttp.ClientWebSocketResponse] = None
 
     async def _generate_access_token(self) -> AccessToken:
         res = await self._game_session.chat_access_token(channel_id=self.chat_channel_id)
@@ -109,11 +109,11 @@ class ChatClient(Client):
             self._sid = body['sid']
         elif cmd_type == ChatCmd.PING:
             await self._ws_pong()
-        elif cmd_type == ChatCmd.CHAT:
-            pass
-        elif cmd_type == ChatCmd.RECENT_CHAT:
-            pass
-        elif cmd_type == ChatCmd.DONATION:
+        elif (
+                cmd_type == ChatCmd.CHAT or
+                cmd_type == ChatCmd.RECENT_CHAT or
+                cmd_type == ChatCmd.DONATION
+        ):
             pass
         elif cmd_type == ChatCmd.NOTICE:
             pass

@@ -1,14 +1,21 @@
-import functools
+import asyncio
 
+from typing import Optional
 from .http import ChzzkAPISession, NaverGameAPISession
 from .live_status import LiveStatus, LiveDetail
 from .user import User
 
 
 class Client:
-    def __init__(self, authorization_key: str = None, session_key: str = None):
-        self._api_session = ChzzkAPISession()
-        self._game_session = NaverGameAPISession()
+    def __init__(
+            self,
+            loop: Optional[asyncio.AbstractEventLoop] = None,
+            authorization_key: Optional[str] = None,
+            session_key: Optional[str] = None
+    ):
+        self.loop = loop or asyncio.get_event_loop()
+        self._api_session = ChzzkAPISession(loop=loop)
+        self._game_session = NaverGameAPISession(loop=loop)
 
     async def close(self):
         await self._api_session.close()

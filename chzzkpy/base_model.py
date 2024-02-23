@@ -1,4 +1,4 @@
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, Optional
 
 from pydantic import BaseModel, ConfigDict
 from pydantic.alias_generators import to_camel
@@ -20,5 +20,5 @@ class ChzzkModel(BaseModel):
 
 class Content(ChzzkModel, Generic[T]):
     code: int
-    message: str | None
+    message: Optional[str]
     content: T

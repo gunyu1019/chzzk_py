@@ -1,11 +1,12 @@
+from typing import Optional
 from ..base_model import ChzzkModel
 
 
 class TemporaryRestrict(ChzzkModel):
     temporary_restrict: bool
     times: int
-    duration: int | None
-    created_time: int | None
+    duration: Optional[int]
+    created_time: Optional[int]
 
 
 class AccessToken(ChzzkModel):
