@@ -75,23 +75,23 @@ class ChzzkSession(Session):
     @staticmethod
     def login_required(func):
         @functools.wraps(func)
-        def wrapper(self: "ChzzkSession", *args, **kwargs):
+        async def wrapper(self: "ChzzkSession", *args, **kwargs):
             if not self.has_login:
                 raise LoginRequired("Login required")
 
-            return func(self, *args, **kwargs)
+            return await func(self, *args, **kwargs)
 
         return wrapper
 
     @staticmethod
     def login_able(func):
         @functools.wraps(func)
-        def wrapper(self: "ChzzkSession", *args, **kwargs):
-            if not self.has_login:
+        async def wrapper(self: "ChzzkSession", *args, **kwargs):
+            if self.has_login:
                 if "Cookie" not in func.__component_parameter__.header.keys():
                     func.__component_parameter__.header["Cookie"] = ""
                 func.__component_parameter__.header["Cookie"] += self._token
-            return func(self, *args, **kwargs)
+            return await func(self, *args, **kwargs)
 
         return wrapper
 
@@ -138,9 +138,9 @@ class NaverGameAPISession(ChzzkSession):
         super().__init__(base_url="https://comm-api.game.naver.com", loop=loop)
 
     @_response_pydantic_model_validation_able
+    @ChzzkSession.logging
     @ChzzkSession.login_required
     @ChzzkSession.login_able
-    @ChzzkSession.logging
     @get("/nng_main/v1/user/getUserStatus")
     @_response_pydantic_model_validation
     async def user(
@@ -149,9 +149,9 @@ class NaverGameAPISession(ChzzkSession):
         pass
 
     @_response_pydantic_model_validation_able
-    @ChzzkSession.login_able
     @ChzzkSession.logging
     @_custom_query_name("channel_id", "channelId")  # Will moved. (Temporary Decorator)
+    @ChzzkSession.login_able
     @get("/nng_main/v1/chats/access-token")
     @Query.default_query("chatType", "STREAMING")
     @_response_pydantic_model_validation
