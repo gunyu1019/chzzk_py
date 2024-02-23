@@ -1,6 +1,7 @@
 import asyncio
 
-from typing import Optional
+from typing import Optional, Self
+from types import TracebackType
 from .http import ChzzkAPISession, NaverGameAPISession
 from .live_status import LiveStatus, LiveDetail
 from .user import User
@@ -16,11 +17,29 @@ class Client:
         self.loop = loop or asyncio.get_event_loop()
         self._api_session = ChzzkAPISession(loop=loop)
         self._game_session = NaverGameAPISession(loop=loop)
+        self._closed = False
 
         if authorization_key is not None and session_key is not None:
             self.login(authorization_key, session_key)
 
+    async def __aenter__(self) -> Self:
+        return self
+
+    async def __aexit__(
+        self,
+        exc_type: Optional[type[BaseException]],
+        exc_value: Optional[BaseException],
+        traceback: Optional[TracebackType],
+    ) -> None:
+        if not self.is_closed:
+            await self.close()
+
+    @property
+    def is_closed(self) -> bool:
+        return self._closed
+
     async def close(self):
+        self._closed = True
         await self._api_session.close()
         await self._game_session.close()
         return
