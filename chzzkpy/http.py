@@ -1,16 +1,18 @@
+import aiohttp
 import asyncio
 import functools
 import inspect
-from typing import Annotated, Optional
-
-import aiohttp
+import logging
 from async_client_decorator import Session, get, Path, Query
+from typing import Annotated, Optional
 
 from .base_model import ChzzkModel, Content
 from .chat.access_token import AccessToken
 from .error import LoginRequired
 from .live_status import LiveStatus, LiveDetail
 from .user import User
+
+_log = logging.getLogger(__name__)
 
 
 # This decorator will remove at https://github.com/gunyu1019/async-client-decorator/issues/8
@@ -93,6 +95,14 @@ class ChzzkSession(Session):
 
         return wrapper
 
+    @staticmethod
+    def logging(func):
+        @functools.wraps(func)
+        def wrapper(self: "ChzzkSession", *args, **kwargs):
+            _log.debug(f"Path({func.__request_path__}) was called.")
+            return func(self, *args, **kwargs)
+        return wrapper
+
     @property
     def _token(self) -> str:
         return f"NID_SES={self._session_key}; NID_AUT={self._authorization_key}"
@@ -103,6 +113,7 @@ class ChzzkAPISession(ChzzkSession):
         super().__init__(base_url="https://api.chzzk.naver.com", loop=loop)
 
     @_response_pydantic_model_validation_able
+    @ChzzkSession.logging
     @get("/polling/v2/channels/{channel_id}/live-status")
     @_response_pydantic_model_validation
     async def live_status(
@@ -112,6 +123,7 @@ class ChzzkAPISession(ChzzkSession):
         pass
 
     @_response_pydantic_model_validation_able
+    @ChzzkSession.logging
     @get("/service/v2/channels/{channel_id}/live-detail")
     @_response_pydantic_model_validation
     async def live_detail(
@@ -128,6 +140,7 @@ class NaverGameAPISession(ChzzkSession):
     @_response_pydantic_model_validation_able
     @ChzzkSession.login_required
     @ChzzkSession.login_able
+    @ChzzkSession.logging
     @get("/nng_main/v1/user/getUserStatus")
     @_response_pydantic_model_validation
     async def user(
@@ -137,6 +150,7 @@ class NaverGameAPISession(ChzzkSession):
 
     @_response_pydantic_model_validation_able
     @ChzzkSession.login_able
+    @ChzzkSession.logging
     @_custom_query_name("channel_id", "channelId")  # Will moved. (Temporary Decorator)
     @get("/nng_main/v1/chats/access-token")
     @Query.default_query("chatType", "STREAMING")
