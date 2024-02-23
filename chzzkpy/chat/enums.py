@@ -1,4 +1,4 @@
-from enum import IntEnum
+from enum import IntEnum, StrEnum
 from typing import TypeVar, Any
 
 E = TypeVar('E', bound='Enum')
@@ -30,6 +30,14 @@ class ChatType(IntEnum):
     RICH = 5
     DONATION = 10
     SYSTEM_MESSAGE = 30
+
+
+class UserRole(StrEnum):
+    common_user = "common_user"
+    streamer = "streamer"
+    chat_manager = "streaming_chat_manager"
+    channel_manager = "streaming_channel_manager"
+    manager = "manager"
 
 
 def get_enum(cls: type[E], val: Any) -> E:
