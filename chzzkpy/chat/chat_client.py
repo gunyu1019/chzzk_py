@@ -1,12 +1,13 @@
 import asyncio
 import logging
-from typing import Optional, Callable
+from typing import Any, Optional, Callable, Coroutine
 
 import aiohttp
 
 from .access_token import AccessToken
-from .gateway import ChzzkWebSocket
+from .gateway import ChzzkWebSocket, ReconnectWebsocket
 from ..client import Client
+from ..error import LoginRequired
 
 _log = logging.getLogger(__name__)
 
@@ -27,10 +28,10 @@ class ChatClient(Client):
         self.access_token: Optional[AccessToken] = None
         self.user_id: Optional[str] = None
 
-        self.ws_session = aiohttp.ClientSession()
-        self._closed = False
+        self.ws_session = aiohttp.ClientSession(loop=self.loop)
 
-        self._listeners: dict[str, list[asyncio.Future, Callable[..., bool]]] = dict()
+        self._listeners: dict[str, list[tuple[asyncio.Future, Callable[..., bool]]]] = dict()
+        self._extra_event: dict[str, list[Callable[..., Coroutine[Any, Any, Any]]]] = dict()
 
         self._gateway: Optional[ChzzkWebSocket] = None
 
@@ -43,9 +44,14 @@ class ChatClient(Client):
     def is_connected(self) -> bool:
         return self._gateway.connected
 
-    @property
-    def is_closed(self) -> bool:
-        return self._closed
+    def run(self, authorization_key: str = None, session_key: str = None, *, reconnect: bool = True) -> None:
+        wrapper = self.start(authorization_key, session_key, reconnect=reconnect)
+        self.loop.run_until_complete(wrapper)
+
+    async def start(self, authorization_key: str = None, session_key: str = None, *, reconnect: bool = True):
+        if authorization_key is not None and session_key is not None:
+            self.login(authorization_key=authorization_key, session_key=session_key)
+        await self.connect(reconnect=reconnect)
 
     async def connect(self, reconnect: bool = True) -> None:
         if self.chat_channel_id is None:
@@ -59,32 +65,134 @@ class ChatClient(Client):
         if self.access_token is None:
             await self._generate_access_token()
 
-        await self.polling()
+        await self.polling(reconnect)
 
     async def close(self):
-        await self._gateway.socket.close()
         await self.ws_session.close()
+        if self._gateway is not None:
+            await self._gateway.socket.close()
         await super().close()
 
-    async def polling(self):
-        initial_connect = True
+    async def polling(self, reconnect: bool = True) -> None:
         session_id: Optional[str] = None
         while not self.is_closed:
-            self._gateway = await ChzzkWebSocket.from_client(
-                self,
-                initial=initial_connect,
-                session_id=session_id
-            )
-
-            if initial_connect or session_id is None:
-                await self._gateway.send_open(
-                    access_token=self.access_token.access_token,
-                    chat_channel_id=self.chat_channel_id,
-                    mode="READ" if self.user_id is None else "SEND",
-                    user_id=self.user_id
+            try:
+                self._gateway = await ChzzkWebSocket.from_client(
+                    self,
+                    session_id=session_id
                 )
-                session_id = self._gateway.session_id
-            initial_connect = False
 
-            while True:
-                await self._gateway.poll_event()
+                if session_id is None:
+                    await self._gateway.send_open(
+                        access_token=self.access_token.access_token,
+                        chat_channel_id=self.chat_channel_id,
+                        mode="READ" if self.user_id is None else "SEND",
+                        user_id=self.user_id
+                    )
+                    session_id = self._gateway.session_id
+
+                    self.dispatch('ready')
+
+                while True:
+                    await self._gateway.poll_event()
+            except ReconnectWebsocket:
+                self.dispatch('disconnect')
+                continue
+
+    def wait_for(
+            self,
+            event: str,
+            check: Optional[Callable[..., bool]] = None,
+            timeout: Optional[float] = None
+    ):
+        future = self.loop.create_future()
+
+        if check is None:
+            def _check(*_):
+                return True
+
+            check = _check
+        event_name = event.lower()
+
+        if event_name not in self._listeners.keys():
+            self._listeners[event_name] = list()
+        self._listeners[event_name].append((future, check))
+        return asyncio.wait_for(future, timeout=timeout)
+
+    def event(self, coro: Callable[..., Coroutine[Any, Any, Any]]) -> Callable[..., Coroutine[Any, Any, Any]]:
+        if not asyncio.iscoroutinefunction(coro):
+            raise TypeError("function must be a coroutine.")
+
+        event_name = coro.__name__
+        if event_name not in self._listeners.keys():
+            self._extra_event[event_name] = list()
+        self._extra_event[event_name].append(coro)
+        return coro
+
+    def dispatch(self, event: str, *args: Any, **kwargs) -> None:
+        _log.debug("Dispatching event %s", event)
+        method = 'on_' + event
+
+        # wait-for listeners
+        if event in self._listeners.keys():
+            listeners = self._listeners[event]
+            _new_listeners = []
+
+            for index, (future, condition) in enumerate(listeners):
+                if future.cancelled():
+                    continue
+
+                try:
+                    result = condition(*args, **kwargs)
+                except Exception as e:
+                    future.set_exception(e)
+                    continue
+                if result:
+                    match len(args):
+                        case 0:
+                            future.set_result(None)
+                        case 1:
+                            future.set_result(args[0])
+                        case _:
+                            future.set_result(args)
+
+                _new_listeners.append((future, condition))
+            self._listeners[event] = _new_listeners
+
+        # event-listener
+        if method not in self._extra_event.keys():
+            return
+
+        for coroutine_function in self._extra_event[method]:
+            self._schedule_event(coroutine_function, event_name=event, *args, **kwargs)
+
+    @staticmethod
+    async def _run_event(
+            coro: Callable[..., Coroutine[Any, Any, Any]],
+            *args: Any,
+            **kwargs: Any,
+    ) -> None:
+        try:
+            await coro(*args, **kwargs)
+        except asyncio.CancelledError:
+            pass
+
+    def _schedule_event(
+            self,
+            coro: Callable[..., Coroutine[Any, Any, Any]],
+            event_name: str,
+            *args: Any,
+            **kwargs: Any,
+    ) -> asyncio.Task:
+        wrapped = self._run_event(coro, *args, **kwargs)
+        # Schedules the task
+        return self.loop.create_task(wrapped, name=f'discord.py: {event_name}')
+
+    async def send_chat(self, message: str) -> None:
+        if not self.is_connected:
+            return
+
+        if not self.user_id:
+            raise LoginRequired()
+
+        await self._gateway.send_chat(message, self.chat_channel_id)
