@@ -1,11 +1,13 @@
 import datetime
-from typing import Optional, Literal
+from typing import Optional, Literal, TypeVar, Generic
 
 from pydantic import AliasChoices, Field, Json
 
 from .enums import ChatType
 from .profile import Profile
 from ..base_model import ChzzkModel
+
+E = TypeVar("E", bound="type")
 
 
 class Extra(ChzzkModel):
@@ -15,7 +17,7 @@ class Extra(ChzzkModel):
     streaming_channel_id: str
 
 
-class Message(ChzzkModel):
+class Message(ChzzkModel, Generic[E]):
     service_id: str = Field(validation_alias=AliasChoices('serviceId', 'svcid'))
     channel_id: str = Field(validation_alias=AliasChoices('channelId', 'cid'))
     user_id: str = Field(validation_alias=AliasChoices('uid', 'userId'))
@@ -23,22 +25,15 @@ class Message(ChzzkModel):
     profile: Optional[Json[Profile]]
     content: str = Field(validation_alias=AliasChoices('msg', 'content'))
     type: ChatType = Field(validation_alias=AliasChoices('msgTypeCode', 'messageTypeCode'))
-    extras: Optional[Json[Extra]]
+    extras: Optional[Json[E]]
 
     created_time: datetime.datetime = Field(validation_alias=AliasChoices('ctime', 'createTime'))
     updated_time: Optional[datetime.datetime] = Field(validation_alias=AliasChoices('utime', 'updateTime'))
     time: datetime.datetime = Field(validation_alias=AliasChoices('msgTime', 'messageTime'))
 
 
-class NoticeMessage(Message):
-    pass
-
-
-class MessageExtendedMemberId(Message):
-    member_id: int = Field(validation_alias=AliasChoices('mbrCnt', 'memberCount'))
-
-
-class ChatMessage(MessageExtendedMemberId):
+class MessageDetail(Message[E], Generic[E]):
+    member_count: int = Field(validation_alias=AliasChoices('mbrCnt', 'memberCount'))
     message_status: Optional[str] = Field(validation_alias=AliasChoices('msgStatueType', 'messageStatusType'))
 
     # message_tid: ???
@@ -47,3 +42,45 @@ class ChatMessage(MessageExtendedMemberId):
     @property
     def is_blind(self) -> bool:
         return self.message_status == 'BLIND'
+
+
+class ChatMessage(Message[Extra]):
+    pass
+
+
+class NoticeExtra(Extra):
+    register_profile: Profile
+
+
+class NoticeMessage(Message[NoticeExtra]):
+    pass
+
+
+class DonationExtra(Extra):
+    user_id_hash: str
+    nickname: str
+    verified_mark: bool
+    donation_amount: int
+    # WIP
+
+
+class DonationMessage(Message[NoticeExtra]):
+    pass
+
+
+class SystemExtraParameter(ChzzkModel):
+    register_nickname: str
+    target_nickname: str
+    register_chat_profile: Profile
+    target_profile: Profile
+
+
+class SystemExtra(ChzzkModel):
+    description: str
+    style_type: int
+    visible_roles: list[str]
+    params: Optional[SystemExtraParameter]
+
+
+class SystemMessage(ChatMessage[SystemExtra]):
+    pass
