@@ -34,6 +34,13 @@ class StreamingProperty(ChzzkModel):
         return Badge.model_validate_json(self._real_time_donation_ranking_dt["badge"])
 
 
+class ActivityBadge(Badge):
+    badgeNo: int
+    badgeId: str
+    description: str
+    activated: bool
+
+
 class Profile(ChzzkModel):
     activity_badges: list[Any]
     user_id_hash: str
@@ -43,6 +50,7 @@ class Profile(ChzzkModel):
     _badge: Optional[dict[str, str]] = PrivateAttr(default=None)
     _title: Optional[dict[str, str]] = PrivateAttr(default=None)
     streaming_property: StreamingProperty
+    activity_badges: list[ActivityBadge]
     verified_mark: bool
 
     def __init__(self, **kwargs):
