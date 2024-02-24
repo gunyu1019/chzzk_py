@@ -93,6 +93,11 @@ class ChzzkWebSocket:
         cmd: int = data['cmd']
         body = data.get('bdy')
 
+        # service_id = data['svcid']
+        # channel_id = data['cid']
+        # version = data['ver']
+        # tid: ? = data.get('tid')
+
         cmd_type = get_enum(ChatCmd, cmd)
         _log.debug("Received Message: %s", data)
 
@@ -102,7 +107,7 @@ class ChzzkWebSocket:
         elif cmd_type == ChatCmd.PING:
             await self.send_pong()
         else:
-            await self._hook(cmd_type, data)
+            await self._hook(cmd_type, body)
 
     async def send(self, data: str) -> None:
         _log.debug("Sending data: %s", data)
