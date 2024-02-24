@@ -172,3 +172,20 @@ class ChzzkWebSocket:
         }
         data.update(self.default_body)
         await self.send_json(data)
+
+    async def request_recent_chat(
+            self,
+            count: int,
+            chat_channel_id: str
+    ):
+        data: dict[str, Any] = {
+            "bdy": {
+                "recentMessageCount": count
+            },
+            "cmd": ChatCmd.REQUEST_RECENT_CHAT,
+            "sid": self.session_id,
+            "cid": chat_channel_id,
+            "tid": 2,
+        }
+        data.update(self.default_body)
+        await self.send_json(data)
