@@ -30,6 +30,7 @@ class ChatType(IntEnum):
     RICH = 5
     DONATION = 10
     SYSTEM_MESSAGE = 30
+    OPEN = 121
 
 
 class UserRole(StrEnum):
