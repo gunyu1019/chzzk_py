@@ -6,6 +6,7 @@ import aiohttp
 
 from .access_token import AccessToken
 from .gateway import ChzzkWebSocket, ReconnectWebsocket
+from .recent_chat import RecentChat
 from ..client import Client
 from ..error import LoginRequired
 
@@ -44,16 +45,19 @@ class ChatClient(Client):
     def is_connected(self) -> bool:
         return self._gateway.connected
 
-    def run(self, authorization_key: str = None, session_key: str = None, *, reconnect: bool = True) -> None:
-        wrapper = self.start(authorization_key, session_key, reconnect=reconnect)
-        self.loop.run_until_complete(wrapper)
+    def run(self, authorization_key: str = None, session_key: str = None) -> None:
+        wrapper = self.start(authorization_key, session_key)
+        try:
+            self.loop.run_until_complete(wrapper)
+        except KeyboardInterrupt:
+            return
 
-    async def start(self, authorization_key: str = None, session_key: str = None, *, reconnect: bool = True):
+    async def start(self, authorization_key: str = None, session_key: str = None):
         if authorization_key is not None and session_key is not None:
             self.login(authorization_key=authorization_key, session_key=session_key)
-        await self.connect(reconnect=reconnect)
+        await self.connect()
 
-    async def connect(self, reconnect: bool = True) -> None:
+    async def connect(self) -> None:
         if self.chat_channel_id is None:
             status = await self.live_status(channel_id=self.channel_id)
             self.chat_channel_id = status.chat_channel_id
@@ -65,7 +69,7 @@ class ChatClient(Client):
         if self.access_token is None:
             await self._generate_access_token()
 
-        await self.polling(reconnect)
+        await self.polling()
 
     async def close(self):
         await self.ws_session.close()
@@ -73,7 +77,7 @@ class ChatClient(Client):
             await self._gateway.socket.close()
         await super().close()
 
-    async def polling(self, reconnect: bool = True) -> None:
+    async def polling(self) -> None:
         session_id: Optional[str] = None
         while not self.is_closed:
             try:
@@ -196,3 +200,14 @@ class ChatClient(Client):
             raise LoginRequired()
 
         await self._gateway.send_chat(message, self.chat_channel_id)
+
+    async def request_recent_chat(self, count: int = 50):
+        if not self.is_connected:
+            return
+
+        await self._gateway.request_recent_chat(count, self.chat_channel_id)
+
+    async def history(self, count: int = 50) -> list[RecentChat]:
+        await self.request_recent_chat(count)
+        result = await self.wait_for('')
+        return result
