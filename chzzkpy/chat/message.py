@@ -34,7 +34,7 @@ class Message(ChzzkModel, Generic[E]):
 
 class MessageDetail(Message[E], Generic[E]):
     member_count: int = Field(validation_alias=AliasChoices('mbrCnt', 'memberCount'))
-    message_status: Optional[str] = Field(validation_alias=AliasChoices('msgStatueType', 'messageStatusType'))
+    message_status: Optional[str] = Field(validation_alias=AliasChoices('msgStatusType', 'messageStatusType'))
 
     # message_tid: ???
     # session: bool
@@ -44,7 +44,7 @@ class MessageDetail(Message[E], Generic[E]):
         return self.message_status == 'BLIND'
 
 
-class ChatMessage(Message[Extra]):
+class ChatMessage(MessageDetail[Extra]):
     pass
 
 
@@ -56,15 +56,24 @@ class NoticeMessage(Message[NoticeExtra]):
     pass
 
 
-class DonationExtra(Extra):
+class DonationRank(ChzzkModel):
     user_id_hash: str
     nickname: str
     verified_mark: bool
     donation_amount: int
-    # WIP
+    ranking: int
 
 
-class DonationMessage(Message[NoticeExtra]):
+class DonationExtra(Extra):
+    is_anonymous: bool = True
+    pay_type: str
+    pay_amount: str
+    donation_type: str
+    weekly_rank_list: list[DonationRank]
+    donation_user_weekly_rank: DonationRank
+
+
+class DonationMessage(MessageDetail[NoticeExtra]):
     pass
 
 
@@ -82,5 +91,5 @@ class SystemExtra(ChzzkModel):
     params: Optional[SystemExtraParameter]
 
 
-class SystemMessage(ChatMessage[SystemExtra]):
+class SystemMessage(MessageDetail[SystemExtra]):
     pass
