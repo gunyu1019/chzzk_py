@@ -180,10 +180,10 @@ class ChatClient(Client):
             return
 
         for coroutine_function in self._extra_event[method]:
-            self._schedule_event(coroutine_function, event_name=event, *args, **kwargs)
+            self._schedule_event(coroutine_function, method, *args, **kwargs)
 
-    @staticmethod
     async def _run_event(
+            self,
             coro: Callable[..., Coroutine[Any, Any, Any]],
             *args: Any,
             **kwargs: Any,
@@ -192,6 +192,8 @@ class ChatClient(Client):
             await coro(*args, **kwargs)
         except asyncio.CancelledError:
             pass
+        except Exception as exc:
+            self.dispatch('on_error', exc, *args, **kwargs)
 
     def _schedule_event(
             self,
@@ -202,7 +204,7 @@ class ChatClient(Client):
     ) -> asyncio.Task:
         wrapped = self._run_event(coro, *args, **kwargs)
         # Schedules the task
-        return self.loop.create_task(wrapped, name=f'discord.py: {event_name}')
+        return self.loop.create_task(wrapped, name=f'chzzk.py: {event_name}')
 
     # API Method
     async def _generate_access_token(self) -> AccessToken:
@@ -229,4 +231,3 @@ class ChatClient(Client):
     async def history(self, count: int = 50) -> list[RecentChat]:
         await self.request_recent_chat(count)
         # WIP
-        return result

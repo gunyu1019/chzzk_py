@@ -45,10 +45,16 @@ class ConnectionState:
             message_raw_type = message.get('messageTypeCode') or message.get('msgTypeCode')
             message_type = get_enum(ChatType, message_raw_type)
 
+            # Cause bug from insufficient information
+            # ChatType: SYSTEM_MESSAGE
+            if message.get('profile') == "{}":
+                message['profile'] = None
+
             if message_type == ChatType.DONATION:
                 validated_data = DonationMessage.model_validate(message)
                 self.dispatch('donation', validated_data)
             elif message_type == ChatType.SYSTEM_MESSAGE:
+
                 validated_data = SystemMessage.model_validate(message)
                 self.dispatch('system_message', validated_data)
             elif message_type == ChatType.TEXT:

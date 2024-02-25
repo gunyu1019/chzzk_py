@@ -28,7 +28,8 @@ class Message(ChzzkModel, Generic[E]):
     extras: Optional[Json[E]]
 
     created_time: datetime.datetime = Field(validation_alias=AliasChoices('ctime', 'createTime'))
-    updated_time: Optional[datetime.datetime] = Field(validation_alias=AliasChoices('utime', 'updateTime'))
+    updated_time: Optional[datetime.datetime] = Field(default=None, validation_alias=AliasChoices('utime',
+                                                                                                  'updateTime'))
     time: datetime.datetime = Field(validation_alias=AliasChoices('msgTime', 'messageTime'))
 
 
@@ -88,7 +89,7 @@ class SystemExtra(ChzzkModel):
     description: str
     style_type: int
     visible_roles: list[str]
-    params: Optional[SystemExtraParameter]
+    params: Optional[SystemExtraParameter] = None
 
 
 class SystemMessage(MessageDetail[SystemExtra]):

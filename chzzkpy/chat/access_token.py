@@ -5,8 +5,8 @@ from ..base_model import ChzzkModel
 class TemporaryRestrict(ChzzkModel):
     temporary_restrict: bool
     times: int
-    duration: Optional[int]
-    created_time: Optional[int]
+    duration: Optional[int] = None
+    created_time: Optional[int] = None
 
 
 class AccessToken(ChzzkModel):
