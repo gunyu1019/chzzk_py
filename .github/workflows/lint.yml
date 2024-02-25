@@ -26,6 +26,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install .[lint]
     - name: Analysing the code with pycodestyle
-      run: python -m pycodestyle async_client_decorator --max-line-length=120
+      run: python -m pycodestyle chzzkpy --max-line-length=120
     - name: Checking the code for formatted in black
-      run: python -m black --check async_client_decorator example
+      run: python -m black --check chzzkpy
