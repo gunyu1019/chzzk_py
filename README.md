@@ -1,8 +1,8 @@
 # chzzkpy
 
-![PyPI - Version](https://img.shields.io/pypi/v/chzzk_py?style=flat)
-![PyPI - Downloads](https://img.shields.io/pypi/dm/chzzk_py?style=flat)
-![PyPI - License](https://img.shields.io/pypi/l/chzzk_py?style=flat)
+![PyPI - Version](https://img.shields.io/pypi/v/chzzkpy?style=flat)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/chzzkpy?style=flat)
+![PyPI - License](https://img.shields.io/pypi/l/chzzkpy?style=flat)
 
 파이썬 기반의 치지직(네이버 라이브 스트리밍 서비스)의 비공식 라이브러리 입니다.<br/>
 채팅 기능을 중점으로 개발하였으며, 다른 기능도 개발될 예정입니다.
@@ -33,6 +33,9 @@ py -3 -m pip install chzzkpy
 ```
 
 ## Quick Example
+
+`chzzkpy`를 사용한 예제는 [Examples](examples)에서 확인하실 수 있습니다.<br/>
+아래는 간단한 예제입니다.
 
 #### 챗봇 (Chat-Bot)
 
