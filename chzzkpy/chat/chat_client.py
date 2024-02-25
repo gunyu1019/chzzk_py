@@ -5,8 +5,10 @@ from typing import Any, Optional, Callable, Coroutine
 import aiohttp
 
 from .access_token import AccessToken
+from .enums import ChatCmd
 from .gateway import ChzzkWebSocket, ReconnectWebsocket
 from .recent_chat import RecentChat
+from .state import ConnectionState
 from ..client import Client
 from ..error import LoginRequired
 
@@ -34,16 +36,17 @@ class ChatClient(Client):
         self._listeners: dict[str, list[tuple[asyncio.Future, Callable[..., bool]]]] = dict()
         self._extra_event: dict[str, list[Callable[..., Coroutine[Any, Any, Any]]]] = dict()
 
-        self._gateway: Optional[ChzzkWebSocket] = None
+        self._ready = asyncio.Event()
 
-    async def _generate_access_token(self) -> AccessToken:
-        res = await self._game_session.chat_access_token(channel_id=self.chat_channel_id)
-        self.access_token = res.content
-        return self.access_token
+        handler = {
+            ChatCmd.CONNECTED: self._ready.set
+        }
+        self._connection = ConnectionState(dispatch=self.dispatch, handler=handler)
+        self._gateway: Optional[ChzzkWebSocket] = None
 
     @property
     def is_connected(self) -> bool:
-        return self._gateway.connected
+        return self._ready.is_set()
 
     def run(self, authorization_key: str = None, session_key: str = None) -> None:
         wrapper = self.start(authorization_key, session_key)
@@ -53,9 +56,12 @@ class ChatClient(Client):
             return
 
     async def start(self, authorization_key: str = None, session_key: str = None):
-        if authorization_key is not None and session_key is not None:
-            self.login(authorization_key=authorization_key, session_key=session_key)
-        await self.connect()
+        try:
+            if authorization_key is not None and session_key is not None:
+                self.login(authorization_key=authorization_key, session_key=session_key)
+            await self.connect()
+        finally:
+            await self.close()
 
     async def connect(self) -> None:
         if self.chat_channel_id is None:
@@ -72,9 +78,11 @@ class ChatClient(Client):
         await self.polling()
 
     async def close(self):
-        await self.ws_session.close()
+        self._ready.clear()
+
         if self._gateway is not None:
             await self._gateway.socket.close()
+        await self.ws_session.close()
         await super().close()
 
     async def polling(self) -> None:
@@ -83,9 +91,11 @@ class ChatClient(Client):
             try:
                 self._gateway = await ChzzkWebSocket.from_client(
                     self,
+                    self._connection,
                     session_id=session_id
                 )
 
+                # Initial Connection
                 if session_id is None:
                     await self._gateway.send_open(
                         access_token=self.access_token.access_token,
@@ -95,13 +105,15 @@ class ChatClient(Client):
                     )
                     session_id = self._gateway.session_id
 
-                    self.dispatch('ready')
-
                 while True:
                     await self._gateway.poll_event()
             except ReconnectWebsocket:
                 self.dispatch('disconnect')
                 continue
+
+    # Event Handler
+    async def wait_until_connected(self) -> None:
+        await self._ready.wait()
 
     def wait_for(
             self,
@@ -192,9 +204,16 @@ class ChatClient(Client):
         # Schedules the task
         return self.loop.create_task(wrapped, name=f'discord.py: {event_name}')
 
+    # API Method
+    async def _generate_access_token(self) -> AccessToken:
+        res = await self._game_session.chat_access_token(channel_id=self.chat_channel_id)
+        self.access_token = res.content
+        return self.access_token
+
+    # Chat Method
     async def send_chat(self, message: str) -> None:
         if not self.is_connected:
-            return
+            raise RuntimeError('Not connected to server. Please connect first.')
 
         if not self.user_id:
             raise LoginRequired()
@@ -203,11 +222,11 @@ class ChatClient(Client):
 
     async def request_recent_chat(self, count: int = 50):
         if not self.is_connected:
-            return
+            raise RuntimeError('Not connected to server. Please connect first.')
 
         await self._gateway.request_recent_chat(count, self.chat_channel_id)
 
     async def history(self, count: int = 50) -> list[RecentChat]:
         await self.request_recent_chat(count)
-        result = await self.wait_for('')
+        # WIP
         return result
