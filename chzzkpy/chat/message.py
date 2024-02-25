@@ -1,18 +1,21 @@
 import datetime
-from typing import Optional, Literal, TypeVar, Generic
-
+from typing import Optional, Literal, TypeVar, Generic, Any
 from pydantic import AliasChoices, Field, Json
 
 from .enums import ChatType
 from .profile import Profile
 from ..base_model import ChzzkModel
 
-E = TypeVar("E", bound="type")
+E = TypeVar("E", bound="ExtraBase")
 
 
-class Extra(ChzzkModel):
+class ExtraBase(ChzzkModel):
+    pass
+
+
+class Extra(ExtraBase):
     chat_type: str
-    emojis: str
+    emojis: Any
     os_type: Literal['PC', 'AOS', 'IOS']
     streaming_channel_id: str
 
@@ -59,33 +62,33 @@ class NoticeMessage(Message[NoticeExtra]):
 
 class DonationRank(ChzzkModel):
     user_id_hash: str
-    nickname: str
+    nickname: str = Field(validation_alias=AliasChoices('nickname', 'nickName'))
     verified_mark: bool
     donation_amount: int
     ranking: int
 
 
-class DonationExtra(Extra):
+class DonationExtra(ExtraBase):
     is_anonymous: bool = True
     pay_type: str
-    pay_amount: str
+    pay_amount: int = 0
     donation_type: str
-    weekly_rank_list: list[DonationRank]
-    donation_user_weekly_rank: DonationRank
+    weekly_rank_list: Optional[list[DonationRank]] = Field(default_factory=list)
+    donation_user_weekly_rank: Optional[DonationRank] = None
 
 
-class DonationMessage(MessageDetail[NoticeExtra]):
+class DonationMessage(MessageDetail[DonationExtra]):
     pass
 
 
 class SystemExtraParameter(ChzzkModel):
     register_nickname: str
     target_nickname: str
-    register_chat_profile: Profile
-    target_profile: Profile
+    register_chat_profile: Json[Profile] = Field(alias='registerChatProfileJson')
+    target_profile: Json[Profile] = Field(alias='targetChatProfileJson')
 
 
-class SystemExtra(ChzzkModel):
+class SystemExtra(ExtraBase):
     description: str
     style_type: int
     visible_roles: list[str]

@@ -112,7 +112,6 @@ class ChzzkWebSocket:
     async def received_message(self, data: dict[str, Any]) -> None:
         cmd: int = data['cmd']
         body = data.get('bdy')
-        print(json.dumps(data, indent=4))
 
         # service_id = data['svcid']
         # channel_id = data['cid']
