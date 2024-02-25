@@ -7,6 +7,7 @@ import aiohttp
 from .access_token import AccessToken
 from .enums import ChatCmd
 from .gateway import ChzzkWebSocket, ReconnectWebsocket
+from .message import ChatMessage
 from .recent_chat import RecentChat
 from .state import ConnectionState
 from ..client import Client
@@ -228,6 +229,7 @@ class ChatClient(Client):
 
         await self._gateway.request_recent_chat(count, self.chat_channel_id)
 
-    async def history(self, count: int = 50) -> list[RecentChat]:
+    async def history(self, count: int = 50) -> list[ChatMessage]:
         await self.request_recent_chat(count)
-        # WIP
+        recent_chat: RecentChat = await self.wait_for('recent_chat', lambda x: len(recent_chat.message_list) <= count)
+        return recent_chat.message_list
