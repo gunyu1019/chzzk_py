@@ -1,4 +1,5 @@
 import inspect
+import functools
 from typing import Callable, Any
 
 from .blind import Blind
@@ -27,12 +28,23 @@ class ConnectionState:
             return func
         return decorator
 
+    @staticmethod
+    def catch_exception(func: Callable[..., Any]):
+        @functools.wraps(func)
+        def wrapper(self, *args, **kwargs):
+            try:
+                return func(self, *args, **kwargs)
+            except Exception as exc:
+                self.dispatch('client_error', exc, *args, **kwargs)
+        return wrapper
+
     def call_handler(self, key: ChatCmd, *args: Any, **kwargs: Any):
         if key in self.handler:
             func = self.handler[key]
             func(*args, **kwargs)
 
     @parsable(ChatCmd.CONNECTED)
+    @catch_exception
     def parse_connect(self, _: dict[str, Any]):
         self.call_handler(ChatCmd.CONNECTED)
         self.dispatch('connect')
@@ -62,24 +74,32 @@ class ConnectionState:
                 self.dispatch('chat', validated_data)
 
     @parsable(ChatCmd.CHAT)
+    @catch_exception
     def parse_chat(self, data: list[dict[str, Any]]):
         self._parse_all_type_of_chat(data)
 
     @parsable(ChatCmd.RECENT_CHAT)
+    @catch_exception
     def parse_recent_chat(self, data: dict[str, Any]):
         validated_data = RecentChat.model_validate(data)
         self.dispatch('recent_chat', validated_data)
 
     @parsable(ChatCmd.SPECIAL_CHAT)
+    @catch_exception
     def parse_special_chat(self, data: list[dict[str, Any]]):
         self._parse_all_type_of_chat(data)
 
     @parsable(ChatCmd.NOTICE)
+    @catch_exception
     def parse_notice(self, data: dict[str, Any]):
+        if not data:
+            self.dispatch('unpin')
         validated_data = NoticeMessage.model_validate(data)
         self.dispatch('notice', validated_data)
+        self.dispatch('pin', validated_data)
 
     @parsable(ChatCmd.BLIND)
+    @catch_exception
     def parse_blind(self, data: dict[str, Any]):
         validated_data = Blind.model_validate(data)
         self.dispatch('blind', validated_data)

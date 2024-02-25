@@ -6,8 +6,8 @@ from ..base_model import ChzzkModel
 
 
 class Badge(ChzzkModel):
-    name: Optional[str]
-    image_url: Optional[str]
+    name: Optional[str] = None
+    image_url: Optional[str] = None
 
 
 class StreamingProperty(ChzzkModel):
@@ -35,23 +35,23 @@ class StreamingProperty(ChzzkModel):
 
 
 class ActivityBadge(Badge):
-    badgeNo: int
-    badgeId: str
-    description: str
+    badge_no: int
+    badge_id: str
+    description: Optional[str] = None
     activated: bool
 
 
 class Profile(ChzzkModel):
     activity_badges: list[Any]
     user_id_hash: str
-    user_role: UserRole = Field(alias='userRoleCode')
+    user_role: Optional[UserRole] = Field(alias='userRoleCode', default=None)
     nickname: str
     profile_image_url: Optional[str]
     _badge: Optional[dict[str, str]] = PrivateAttr(default=None)
     _title: Optional[dict[str, str]] = PrivateAttr(default=None)
-    streaming_property: StreamingProperty
-    activity_badges: list[ActivityBadge]
-    verified_mark: bool
+    streaming_property: Optional[StreamingProperty] = None
+    activity_badges: list[ActivityBadge] = Field(default_factory=list)
+    verified_mark: bool = False
 
     def __init__(self, **kwargs):
         super(ChzzkModel, self).__init__(**kwargs)
