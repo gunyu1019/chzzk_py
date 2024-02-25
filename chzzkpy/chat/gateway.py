@@ -149,7 +149,7 @@ class ChzzkWebSocket:
             await self.send_pong()
             return
 
-        func = self._event_hook[cmd_type]
+        func = self._event_hook.get(cmd_type)
         if func is not None:
             func(body)
 
