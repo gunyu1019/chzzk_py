@@ -1,4 +1,4 @@
-MIT License
+"""MIT License
 
 Copyright (c) 2024 gunyu1019
 
@@ -19,3 +19,24 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+"""
+
+import aiohttp
+from typing import Optional
+
+
+class ConnectionClosed(Exception):
+    def __init__(
+        self, socket: aiohttp.ClientWebSocketResponse, code: Optional[int] = None
+    ):
+        self.code: int = code or socket.close_code or -1
+        self.reason: str = ""
+        super().__init__(f"WebSocket closed with {self.code}")
+
+
+class WebSocketClosure(Exception):
+    pass
+
+
+class ReconnectWebsocket(Exception):
+    pass
