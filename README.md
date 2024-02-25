@@ -37,7 +37,7 @@ py -3 -m pip install chzzkpy
 #### 챗봇 (Chat-Bot)
 
 ```py
-from chzzkpy import ChatClient, ChatMessage, DonationMessage
+from chzzkpy.chat import ChatClient, ChatMessage, DonationMessage
 
 client = ChatClient("channel_id")
 

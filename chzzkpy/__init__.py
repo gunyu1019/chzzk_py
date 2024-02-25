@@ -23,7 +23,6 @@ SOFTWARE.
 
 from typing import NamedTuple, Literal, Optional
 
-from .chat import *
 from .client import Client
 from .error import *
 from .live import LiveStatus, LiveDetail, LivePollingStatus

@@ -20,7 +20,7 @@ extras_require = {
 setup(
     name="chzzkpy",
     version=version,
-    packages=["chzzkpy"],
+    packages=["chzzkpy", "chzzkpy.chat"],
     url="https://github.com/gunyu1019/chzzk_py",
     license="MIT",
     author="gunyu1019",
