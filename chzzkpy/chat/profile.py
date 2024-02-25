@@ -16,20 +16,25 @@ class StreamingProperty(ChzzkModel):
 
     def __init__(self, **kwargs):
         super(ChzzkModel, self).__init__(**kwargs)
-        self._following_dt = kwargs.pop('following', None)
-        self._real_time_donation_ranking_dt = kwargs.pop('realTimeDonationRanking', None)
+        self._following_dt = kwargs.pop("following", None)
+        self._real_time_donation_ranking_dt = kwargs.pop(
+            "realTimeDonationRanking", None
+        )
 
     @computed_field
     @property
     def following_date(self) -> Optional[str]:
         if self._following_dt is None:
             return
-        return self._following_dt['followDate']
+        return self._following_dt["followDate"]
 
     @computed_field
     @property
     def donation_ranking_badge(self) -> Optional[Badge]:
-        if self._real_time_donation_ranking_dt is None or "badge" not in self._real_time_donation_ranking_dt.keys():
+        if (
+            self._real_time_donation_ranking_dt is None
+            or "badge" not in self._real_time_donation_ranking_dt.keys()
+        ):
             return
         return Badge.model_validate_json(self._real_time_donation_ranking_dt["badge"])
 
@@ -44,7 +49,7 @@ class ActivityBadge(Badge):
 class Profile(ChzzkModel):
     activity_badges: list[Any]
     user_id_hash: str
-    user_role: Optional[UserRole] = Field(alias='userRoleCode', default=None)
+    user_role: Optional[UserRole] = Field(alias="userRoleCode", default=None)
     nickname: str
     profile_image_url: Optional[str]
     _badge: Optional[dict[str, str]] = PrivateAttr(default=None)
@@ -55,15 +60,15 @@ class Profile(ChzzkModel):
 
     def __init__(self, **kwargs):
         super(ChzzkModel, self).__init__(**kwargs)
-        self._badge = kwargs.pop('badge', None)
-        self._title = kwargs.pop('title', None)
+        self._badge = kwargs.pop("badge", None)
+        self._title = kwargs.pop("title", None)
 
     @computed_field
     @property
     def color(self) -> Optional[str]:
         if self._title is None:
             return
-        return self._title['color']
+        return self._title["color"]
 
     @computed_field
     @property
@@ -73,6 +78,5 @@ class Profile(ChzzkModel):
         _badge = self._badge or dict()
         _title = self._title or dict()
         return Badge(
-            name=_title.get('name', None),
-            image_url=_badge.get('imageUrl', None)
+            name=_title.get("name", None), image_url=_badge.get("imageUrl", None)
         )

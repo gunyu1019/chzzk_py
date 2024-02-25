@@ -14,7 +14,7 @@ class LivePollingStatus(ChzzkModel):
 
 class LiveStatus(ChzzkModel):
     live_title: str
-    status: Literal['OPEN', 'CLOSE']
+    status: Literal["OPEN", "CLOSE"]
     concurrent_user_count: int
     accumulate_count: int
     paid_promotion: bool
@@ -23,7 +23,7 @@ class LiveStatus(ChzzkModel):
     category_type: Optional[str]
     live_category: str
     live_category_value: str
-    live_polling_status: Json[LivePollingStatus] = Field(alias='livePollingStatusJson')
+    live_polling_status: Json[LivePollingStatus] = Field(alias="livePollingStatusJson")
     fault_status: Any  # typing: ???
     user_adult_status: str
     chat_active: bool

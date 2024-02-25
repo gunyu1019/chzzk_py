@@ -18,14 +18,16 @@ _log = logging.getLogger(__name__)
 
 class ChatClient(Client):
     def __init__(
-            self,
-            channel_id: str,
-            authorization_key: Optional[str] = None,
-            session_key: Optional[str] = None,
-            chat_channel_id: Optional[str] = None,
-            loop: Optional[asyncio.AbstractEventLoop] = None
+        self,
+        channel_id: str,
+        authorization_key: Optional[str] = None,
+        session_key: Optional[str] = None,
+        chat_channel_id: Optional[str] = None,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
     ):
-        super().__init__(loop=loop, authorization_key=authorization_key, session_key=session_key)
+        super().__init__(
+            loop=loop, authorization_key=authorization_key, session_key=session_key
+        )
 
         self.chat_channel_id: str = chat_channel_id
         self.channel_id: str = channel_id
@@ -34,14 +36,16 @@ class ChatClient(Client):
 
         self.ws_session = aiohttp.ClientSession(loop=self.loop)
 
-        self._listeners: dict[str, list[tuple[asyncio.Future, Callable[..., bool]]]] = dict()
-        self._extra_event: dict[str, list[Callable[..., Coroutine[Any, Any, Any]]]] = dict()
+        self._listeners: dict[str, list[tuple[asyncio.Future, Callable[..., bool]]]] = (
+            dict()
+        )
+        self._extra_event: dict[str, list[Callable[..., Coroutine[Any, Any, Any]]]] = (
+            dict()
+        )
 
         self._ready = asyncio.Event()
 
-        handler = {
-            ChatCmd.CONNECTED: self._ready.set
-        }
+        handler = {ChatCmd.CONNECTED: self._ready.set}
         self._connection = ConnectionState(dispatch=self.dispatch, handler=handler)
         self._gateway: Optional[ChzzkWebSocket] = None
 
@@ -91,9 +95,7 @@ class ChatClient(Client):
         while not self.is_closed:
             try:
                 self._gateway = await ChzzkWebSocket.from_client(
-                    self,
-                    self._connection,
-                    session_id=session_id
+                    self, self._connection, session_id=session_id
                 )
 
                 # Initial Connection
@@ -102,14 +104,14 @@ class ChatClient(Client):
                         access_token=self.access_token.access_token,
                         chat_channel_id=self.chat_channel_id,
                         mode="READ" if self.user_id is None else "SEND",
-                        user_id=self.user_id
+                        user_id=self.user_id,
                     )
                     session_id = self._gateway.session_id
 
                 while True:
                     await self._gateway.poll_event()
             except ReconnectWebsocket:
-                self.dispatch('disconnect')
+                self.dispatch("disconnect")
                 continue
 
     # Event Handler
@@ -117,14 +119,15 @@ class ChatClient(Client):
         await self._ready.wait()
 
     def wait_for(
-            self,
-            event: str,
-            check: Optional[Callable[..., bool]] = None,
-            timeout: Optional[float] = None
+        self,
+        event: str,
+        check: Optional[Callable[..., bool]] = None,
+        timeout: Optional[float] = None,
     ):
         future = self.loop.create_future()
 
         if check is None:
+
             def _check(*_):
                 return True
 
@@ -136,7 +139,9 @@ class ChatClient(Client):
         self._listeners[event_name].append((future, check))
         return asyncio.wait_for(future, timeout=timeout)
 
-    def event(self, coro: Callable[..., Coroutine[Any, Any, Any]]) -> Callable[..., Coroutine[Any, Any, Any]]:
+    def event(
+        self, coro: Callable[..., Coroutine[Any, Any, Any]]
+    ) -> Callable[..., Coroutine[Any, Any, Any]]:
         if not asyncio.iscoroutinefunction(coro):
             raise TypeError("function must be a coroutine.")
 
@@ -148,7 +153,7 @@ class ChatClient(Client):
 
     def dispatch(self, event: str, *args: Any, **kwargs) -> None:
         _log.debug("Dispatching event %s", event)
-        method = 'on_' + event
+        method = "on_" + event
 
         # wait-for listeners
         if event in self._listeners.keys():
@@ -184,39 +189,41 @@ class ChatClient(Client):
             self._schedule_event(coroutine_function, method, *args, **kwargs)
 
     async def _run_event(
-            self,
-            coro: Callable[..., Coroutine[Any, Any, Any]],
-            *args: Any,
-            **kwargs: Any,
+        self,
+        coro: Callable[..., Coroutine[Any, Any, Any]],
+        *args: Any,
+        **kwargs: Any,
     ) -> None:
         try:
             await coro(*args, **kwargs)
         except asyncio.CancelledError:
             pass
         except Exception as exc:
-            self.dispatch('on_error', exc, *args, **kwargs)
+            self.dispatch("on_error", exc, *args, **kwargs)
 
     def _schedule_event(
-            self,
-            coro: Callable[..., Coroutine[Any, Any, Any]],
-            event_name: str,
-            *args: Any,
-            **kwargs: Any,
+        self,
+        coro: Callable[..., Coroutine[Any, Any, Any]],
+        event_name: str,
+        *args: Any,
+        **kwargs: Any,
     ) -> asyncio.Task:
         wrapped = self._run_event(coro, *args, **kwargs)
         # Schedules the task
-        return self.loop.create_task(wrapped, name=f'chzzk.py: {event_name}')
+        return self.loop.create_task(wrapped, name=f"chzzk.py: {event_name}")
 
     # API Method
     async def _generate_access_token(self) -> AccessToken:
-        res = await self._game_session.chat_access_token(channel_id=self.chat_channel_id)
+        res = await self._game_session.chat_access_token(
+            channel_id=self.chat_channel_id
+        )
         self.access_token = res.content
         return self.access_token
 
     # Chat Method
     async def send_chat(self, message: str) -> None:
         if not self.is_connected:
-            raise RuntimeError('Not connected to server. Please connect first.')
+            raise RuntimeError("Not connected to server. Please connect first.")
 
         if not self.user_id:
             raise LoginRequired()
@@ -225,11 +232,13 @@ class ChatClient(Client):
 
     async def request_recent_chat(self, count: int = 50):
         if not self.is_connected:
-            raise RuntimeError('Not connected to server. Please connect first.')
+            raise RuntimeError("Not connected to server. Please connect first.")
 
         await self._gateway.request_recent_chat(count, self.chat_channel_id)
 
     async def history(self, count: int = 50) -> list[ChatMessage]:
         await self.request_recent_chat(count)
-        recent_chat: RecentChat = await self.wait_for('recent_chat', lambda x: len(recent_chat.message_list) <= count)
+        recent_chat: RecentChat = await self.wait_for(
+            "recent_chat", lambda x: len(recent_chat.message_list) <= count
+        )
         return recent_chat.message_list

@@ -45,7 +45,9 @@ def _response_pydantic_model_validation_able(func):
 # This decorator will remove at https://github.com/gunyu1019/async-client-decorator/issues/9
 def _custom_query_name(oldest_name, replace_name):
     def decorator(func):
-        func.__component_parameter__.query[replace_name] = func.__component_parameter__.query.pop(oldest_name)
+        func.__component_parameter__.query[replace_name] = (
+            func.__component_parameter__.query.pop(oldest_name)
+        )
 
         @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
@@ -101,6 +103,7 @@ class ChzzkSession(Session):
         def wrapper(self: "ChzzkSession", *args, **kwargs):
             _log.debug(f"Path({func.__request_path__}) was called.")
             return func(self, *args, **kwargs)
+
         return wrapper
 
     @property
@@ -117,8 +120,7 @@ class ChzzkAPISession(ChzzkSession):
     @get("/polling/v2/channels/{channel_id}/live-status")
     @_response_pydantic_model_validation
     async def live_status(
-            self,
-            channel_id: Annotated[str, Path]
+        self, channel_id: Annotated[str, Path]
     ) -> Content[LiveStatus]:
         pass
 
@@ -127,8 +129,7 @@ class ChzzkAPISession(ChzzkSession):
     @get("/service/v2/channels/{channel_id}/live-detail")
     @_response_pydantic_model_validation
     async def live_detail(
-            self,
-            channel_id: Annotated[str, Path]
+        self, channel_id: Annotated[str, Path]
     ) -> Content[LiveDetail]:
         pass
 
@@ -143,9 +144,7 @@ class NaverGameAPISession(ChzzkSession):
     @ChzzkSession.login_able
     @get("/nng_main/v1/user/getUserStatus")
     @_response_pydantic_model_validation
-    async def user(
-            self
-    ) -> Content[User]:
+    async def user(self) -> Content[User]:
         pass
 
     @_response_pydantic_model_validation_able
@@ -156,7 +155,6 @@ class NaverGameAPISession(ChzzkSession):
     @Query.default_query("chatType", "STREAMING")
     @_response_pydantic_model_validation
     async def chat_access_token(
-            self,
-            channel_id: Annotated[str, Query]
+        self, channel_id: Annotated[str, Query]
     ) -> Content[AccessToken]:
         pass

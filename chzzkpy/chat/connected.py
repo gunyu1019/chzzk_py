@@ -6,7 +6,7 @@ from ..base_model import ChzzkModel
 
 
 class ConnectedInfo(ChzzkModel):
-    access_token: str = Field(alias='accTkn')
-    auth: Literal['SEND', 'READ']
+    access_token: str = Field(alias="accTkn")
+    auth: Literal["SEND", "READ"]
     uuid: Optional[str]
-    session_id: str = Field(alias='sid')
+    session_id: str = Field(alias="sid")

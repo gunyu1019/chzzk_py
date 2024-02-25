@@ -9,10 +9,10 @@ from .user import User
 
 class Client:
     def __init__(
-            self,
-            loop: Optional[asyncio.AbstractEventLoop] = None,
-            authorization_key: Optional[str] = None,
-            session_key: Optional[str] = None
+        self,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
+        authorization_key: Optional[str] = None,
+        session_key: Optional[str] = None,
     ):
         self.loop = loop or asyncio.get_event_loop()
         self._api_session = ChzzkAPISession(loop=loop)

@@ -15,9 +15,7 @@ class User(ChzzkModel):
     official_noti_agree: bool
     official_noti_agree_updated_date: Annotated[
         Optional[datetime.datetime],
-        BeforeValidator(
-            ChzzkModel.special_date_parsing_validator
-        )
+        BeforeValidator(ChzzkModel.special_date_parsing_validator),
     ]  # Example: YYYY-MM-DDTHH:MM:SS.SSS+09
     verified_mark: bool
     logged_in: Optional[bool]

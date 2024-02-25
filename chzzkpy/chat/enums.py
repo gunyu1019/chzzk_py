@@ -1,7 +1,7 @@
 from enum import IntEnum, StrEnum
 from typing import TypeVar, Any
 
-E = TypeVar('E', bound='Enum')
+E = TypeVar("E", bound="Enum")
 
 
 class ChatCmd(IntEnum):

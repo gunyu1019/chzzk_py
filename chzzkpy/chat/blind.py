@@ -7,7 +7,7 @@ from ..base_model import ChzzkModel
 
 class Blind(ChzzkModel):
     service_id: str
-    time: datetime.datetime = Field(alias='messageTime')
+    time: datetime.datetime = Field(alias="messageTime")
     blind_type: str
     blind_user_id: Optional[str]
     user_id: str
