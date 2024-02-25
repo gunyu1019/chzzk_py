@@ -12,6 +12,7 @@ from .error import ConnectionClosed, WebSocketClosure, ReconnectWebsocket
 
 if TYPE_CHECKING:
     from .chat_client import ChatClient
+    from .state import ConnectionState
 
 _log = logging.getLogger(__name__)
 
@@ -21,31 +22,57 @@ class ChzzkWebSocket:
             self,
             socket: aiohttp.ClientWebSocketResponse,
             loop: asyncio.AbstractEventLoop,
-            hook: Callable[..., Coroutine[Any, Any, Any]] = None,
     ):
         self.socket: aiohttp.ClientWebSocketResponse = socket
         self.loop: asyncio.AbstractEventLoop = loop
-
-        self._connected: bool = False
         self.session_id: Optional[str] = None
 
         self._max_timeout: float = 60.0
 
-        if hook is not None:
-            self._hook = hook
+        self._event_hook: dict[ChatCmd, Optional[Callable[..., Any]]] = {
+            key: None
+            for key in list(ChatCmd)
+        }
+
+    def set_hook(self, cmd: ChatCmd, coro_func: Callable[..., Any]):
+        self._event_hook[cmd] = coro_func
+
+    def remove_hook(self, cmd: ChatCmd):
+        self._event_hook[cmd] = None
+
+    @classmethod
+    async def new_session(
+            cls,
+            loop: asyncio.AbstractEventLoop,
+            session: aiohttp.ClientSession,
+            channel_id: str,
+            session_id: Optional[str] = None
+    ) -> Self:
+        server_id = abs(sum([ord(x) for x in channel_id])) % 9 + 1
+        url = f"wss://kr-ss{server_id}.chat.naver.com/chat"
+        socket: aiohttp.ClientWebSocketResponse = await session.ws_connect(url)
+
+        websocket = cls(socket, loop)
+        websocket.session_id = session_id
+        return websocket
 
     @classmethod
     async def from_client(
             cls,
             client: "ChatClient",
+            state: "ConnectionState",
             session_id: Optional[str] = None
     ) -> Self:
-        server_id = abs(sum([ord(x) for x in client.chat_channel_id])) % 9 + 1
-        url = f"wss://kr-ss{server_id}.chat.naver.com/chat"
-        socket: aiohttp.ClientWebSocketResponse = await client.ws_session.ws_connect(url)
-
-        websocket = cls(socket, client.loop)
-        websocket.session_id = session_id
+        websocket = await cls.new_session(
+            loop=client.loop,
+            session=client.ws_session,
+            channel_id=client.chat_channel_id,
+            session_id=session_id
+        )
+        for cmd, parsing_func in state.parsers.items():
+            if parsing_func is None:
+                continue
+            websocket.set_hook(cmd, parsing_func)
         return websocket
 
     @property
@@ -54,13 +81,6 @@ class ChzzkWebSocket:
             "svcid": "game",
             "ver": "2"
         }
-
-    @property
-    def connected(self) -> bool:
-        return self._connected
-
-    async def _hook(self, evnet: ChatCmd, data: dict[str, Any]) -> None:
-        pass
 
     def _can_handle_close(self, code: Optional[int] = None) -> bool:
         if code is None:
@@ -92,6 +112,7 @@ class ChzzkWebSocket:
     async def received_message(self, data: dict[str, Any]) -> None:
         cmd: int = data['cmd']
         body = data.get('bdy')
+        print(json.dumps(data, indent=4))
 
         # service_id = data['svcid']
         # channel_id = data['cid']
@@ -102,12 +123,14 @@ class ChzzkWebSocket:
         _log.debug("Received Message: %s", data)
 
         if cmd_type == ChatCmd.CONNECTED:
-            self._connected = True
             self.session_id = body['sid']
         elif cmd_type == ChatCmd.PING:
             await self.send_pong()
-        else:
-            await self._hook(cmd_type, body)
+            return
+
+        func = self._event_hook[cmd_type]
+        if func is not None:
+            func(body)
 
     async def send(self, data: str) -> None:
         _log.debug("Sending data: %s", data)
