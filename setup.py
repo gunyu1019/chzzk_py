@@ -25,7 +25,7 @@ setup(
     license="MIT",
     author="gunyu1019",
     author_email="gunyu1019@yhs.kr",
-    description="A unofficial Python API library of Chzzk(Naver live-streaming service)",
+    description="An unofficial Python library of Chzzk(Naver live-streaming service)",
     python_requires=">=3.10",
     extras_require=extras_require,
     long_description=open("README.md", encoding="UTF-8").read(),

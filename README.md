@@ -1,3 +1,61 @@
-# chzzk.py
-네이버 라이브 스트리밍 서비스 비공식 파이썬 라이브러리 (WIP)<br/>
-본 프로젝트는 `채팅`을 목표로 진행합니다! 기여는 환영합니다.
+# chzzkpy
+
+![PyPI - Version](https://img.shields.io/pypi/v/chzzk_py?style=flat)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/chzzk_py?style=flat)
+![PyPI - License](https://img.shields.io/pypi/l/chzzk_py?style=flat)
+
+파이썬 기반의 치지직(네이버 라이브 스트리밍 서비스)의 비공식 라이브러리 입니다.<br/>
+채팅 기능을 중점으로 개발하였으며, 다른 기능도 개발될 예정입니다.
+
+An unofficial python library for [Chzzk(Naver Live Streaming Service)](https://chzzk.naver.com/).<br/>
+This library focused on chat. However, other feature will be developed.
+
+#### Available Features
+
+* 채팅
+    * 사용자 상호 채팅 (`on_chat` <-> `client.send_chat`)
+    * 사용자 후원 (`on_donation`)
+    * 메시지 상단 고정하기 (`on_pin`, `on_unpin`)
+    * 시스템 메시지 (`on_system_message`)
+* 로그인 (쿠키 값 `NID_AUT`, `NID_SES` 사용)
+* 방송 상태 조회
+
+## Installation
+
+**Python 3.10 or higher is required.**
+
+```bash
+# Linux/MacOS
+python3 -m pip install chzzkpy
+
+# Windows
+py -3 -m pip install chzzkpy
+```
+
+## Quick Example
+
+#### 챗봇 (Chat-Bot)
+
+```py
+from chzzkpy import ChatClient, ChatMessage, DonationMessage
+
+client = ChatClient("channel_id")
+
+
+@client.event
+async def on_chat(message: ChatMessage):
+    if message.content == "!안녕":
+        await client.send_chat("%s님, 안녕하세요!" % message.profile.nickname)
+
+
+@client.event
+async def on_donation(message: DonationMessage):
+    await client.send_chat("%s님, %d원 후원 감사합니다." % (message.profile.nickname, message.extras.pay_amount))
+
+
+client.run("NID_AUT", "NID_SES")
+```
+
+## Contributions 
+`chzzkpy`의 기여는 언제든지 환영합니다!<br/>
+버그 또는 새로운 기능은 `Pull Request`로 진행해주세요.
