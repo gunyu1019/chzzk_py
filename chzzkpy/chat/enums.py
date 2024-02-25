@@ -13,7 +13,7 @@ class ChatCmd(IntEnum):
     RECENT_CHAT = 15101
     EVENT = 93006
     CHAT = 93101
-    DONATION = 93102
+    SPECIAL_CHAT = 93102  # Donation / System Message
     KICK = 94005
     BLOCK = 94006
     BLIND = 94008
