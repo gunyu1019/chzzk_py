@@ -30,11 +30,13 @@ import aiohttp
 from .access_token import AccessToken
 from .enums import ChatCmd
 from .gateway import ChzzkWebSocket, ReconnectWebsocket
+from .http import ChzzkChatSession
 from .message import ChatMessage
 from .recent_chat import RecentChat
 from .state import ConnectionState
 from ..client import Client
 from ..error import LoginRequired
+from ..http import ChzzkAPISession
 
 _log = logging.getLogger(__name__)
 
@@ -71,6 +73,10 @@ class ChatClient(Client):
         handler = {ChatCmd.CONNECTED: self._ready.set}
         self._connection = ConnectionState(dispatch=self.dispatch, handler=handler)
         self._gateway: Optional[ChzzkWebSocket] = None
+
+    def _session_initial_set(self):
+        self._api_session = ChzzkAPISession(loop=self.loop)
+        self._game_session = ChzzkChatSession(loop=self.loop)
 
     @property
     def is_connected(self) -> bool:
@@ -214,6 +220,7 @@ class ChatClient(Client):
     async def _run_event(
         self,
         coro: Callable[..., Coroutine[Any, Any, Any]],
+        event_name: str,
         *args: Any,
         **kwargs: Any,
     ) -> None:
@@ -222,7 +229,11 @@ class ChatClient(Client):
         except asyncio.CancelledError:
             pass
         except Exception as exc:
-            self.dispatch("on_error", exc, *args, **kwargs)
+            try:
+                _log.exception("Ignoring exception in %s", event_name)
+                self.dispatch("error", exc, *args, **kwargs)
+            except asyncio.CancelledError:
+                pass
 
     def _schedule_event(
         self,
@@ -231,7 +242,7 @@ class ChatClient(Client):
         *args: Any,
         **kwargs: Any,
     ) -> asyncio.Task:
-        wrapped = self._run_event(coro, *args, **kwargs)
+        wrapped = self._run_event(coro, event_name, *args, **kwargs)
         # Schedules the task
         return self.loop.create_task(wrapped, name=f"chzzk.py: {event_name}")
 

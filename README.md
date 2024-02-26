@@ -34,6 +34,9 @@ py -3 -m pip install chzzkpy
 
 ## Quick Example
 
+`chzzkpy`를 사용한 예제는 [Examples](examples)에서 확인하실 수 있습니다.<br/>
+아래는 간단한 예제입니다.
+
 #### 챗봇 (Chat-Bot)
 
 ```py

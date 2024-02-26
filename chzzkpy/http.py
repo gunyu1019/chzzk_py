@@ -21,16 +21,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-import aiohttp
 import asyncio
 import functools
 import inspect
 import logging
-from async_client_decorator import Session, get, Path, Query
 from typing import Annotated, Optional
 
+import aiohttp
+from async_client_decorator import Session, get, Path
+
 from .base_model import ChzzkModel, Content
-from .chat.access_token import AccessToken
 from .error import LoginRequired
 from .live import LiveStatus, LiveDetail
 from .user import User
@@ -102,7 +102,7 @@ class ChzzkSession(Session):
         @functools.wraps(func)
         async def wrapper(self: "ChzzkSession", *args, **kwargs):
             if not self.has_login:
-                raise LoginRequired("Login required")
+                raise LoginRequired()
 
             return await func(self, *args, **kwargs)
 
@@ -168,16 +168,4 @@ class NaverGameAPISession(ChzzkSession):
     @get("/nng_main/v1/user/getUserStatus")
     @_response_pydantic_model_validation
     async def user(self) -> Content[User]:
-        pass
-
-    @_response_pydantic_model_validation_able
-    @ChzzkSession.logging
-    @_custom_query_name("channel_id", "channelId")  # Will moved. (Temporary Decorator)
-    @ChzzkSession.login_able
-    @get("/nng_main/v1/chats/access-token")
-    @Query.default_query("chatType", "STREAMING")
-    @_response_pydantic_model_validation
-    async def chat_access_token(
-        self, channel_id: Annotated[str, Query]
-    ) -> Content[AccessToken]:
         pass

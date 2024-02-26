@@ -38,12 +38,18 @@ class Client:
         session_key: Optional[str] = None,
     ):
         self.loop = loop or asyncio.get_event_loop()
-        self._api_session = ChzzkAPISession(loop=loop)
-        self._game_session = NaverGameAPISession(loop=loop)
         self._closed = False
+        self._api_session = None
+        self._game_session = None
 
         if authorization_key is not None and session_key is not None:
             self.login(authorization_key, session_key)
+
+        self._session_initial_set()
+
+    def _session_initial_set(self):
+        self._api_session = ChzzkAPISession(loop=self.loop)
+        self._game_session = NaverGameAPISession(loop=self.loop)
 
     async def __aenter__(self) -> Self:
         return self
