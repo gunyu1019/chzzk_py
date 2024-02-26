@@ -43,12 +43,12 @@ _log = logging.getLogger(__name__)
 
 class ChatClient(Client):
     def __init__(
-            self,
-            channel_id: str,
-            authorization_key: Optional[str] = None,
-            session_key: Optional[str] = None,
-            chat_channel_id: Optional[str] = None,
-            loop: Optional[asyncio.AbstractEventLoop] = None,
+        self,
+        channel_id: str,
+        authorization_key: Optional[str] = None,
+        session_key: Optional[str] = None,
+        chat_channel_id: Optional[str] = None,
+        loop: Optional[asyncio.AbstractEventLoop] = None,
     ):
         super().__init__(
             loop=loop, authorization_key=authorization_key, session_key=session_key
@@ -148,14 +148,15 @@ class ChatClient(Client):
         await self._ready.wait()
 
     def wait_for(
-            self,
-            event: str,
-            check: Optional[Callable[..., bool]] = None,
-            timeout: Optional[float] = None,
+        self,
+        event: str,
+        check: Optional[Callable[..., bool]] = None,
+        timeout: Optional[float] = None,
     ):
         future = self.loop.create_future()
 
         if check is None:
+
             def _check(*_):
                 return True
 
@@ -168,7 +169,7 @@ class ChatClient(Client):
         return asyncio.wait_for(future, timeout=timeout)
 
     def event(
-            self, coro: Callable[..., Coroutine[Any, Any, Any]]
+        self, coro: Callable[..., Coroutine[Any, Any, Any]]
     ) -> Callable[..., Coroutine[Any, Any, Any]]:
         if not asyncio.iscoroutinefunction(coro):
             raise TypeError("function must be a coroutine.")
@@ -217,11 +218,11 @@ class ChatClient(Client):
             self._schedule_event(coroutine_function, method, *args, **kwargs)
 
     async def _run_event(
-            self,
-            coro: Callable[..., Coroutine[Any, Any, Any]],
-            event_name: str,
-            *args: Any,
-            **kwargs: Any,
+        self,
+        coro: Callable[..., Coroutine[Any, Any, Any]],
+        event_name: str,
+        *args: Any,
+        **kwargs: Any,
     ) -> None:
         try:
             await coro(*args, **kwargs)
@@ -229,17 +230,17 @@ class ChatClient(Client):
             pass
         except Exception as exc:
             try:
-                _log.exception('Ignoring exception in %s', event_name)
+                _log.exception("Ignoring exception in %s", event_name)
                 self.dispatch("error", exc, *args, **kwargs)
             except asyncio.CancelledError:
                 pass
 
     def _schedule_event(
-            self,
-            coro: Callable[..., Coroutine[Any, Any, Any]],
-            event_name: str,
-            *args: Any,
-            **kwargs: Any,
+        self,
+        coro: Callable[..., Coroutine[Any, Any, Any]],
+        event_name: str,
+        *args: Any,
+        **kwargs: Any,
     ) -> asyncio.Task:
         wrapped = self._run_event(coro, event_name, *args, **kwargs)
         # Schedules the task

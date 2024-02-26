@@ -8,7 +8,7 @@ from ..http import (
     NaverGameAPISession,
     _response_pydantic_model_validation_able,
     _custom_query_name,
-    _response_pydantic_model_validation
+    _response_pydantic_model_validation,
 )
 
 

@@ -143,7 +143,7 @@ class ChzzkAPISession(ChzzkSession):
     @get("/polling/v2/channels/{channel_id}/live-status")
     @_response_pydantic_model_validation
     async def live_status(
-            self, channel_id: Annotated[str, Path]
+        self, channel_id: Annotated[str, Path]
     ) -> Content[LiveStatus]:
         pass
 
@@ -152,7 +152,7 @@ class ChzzkAPISession(ChzzkSession):
     @get("/service/v2/channels/{channel_id}/live-detail")
     @_response_pydantic_model_validation
     async def live_detail(
-            self, channel_id: Annotated[str, Path]
+        self, channel_id: Annotated[str, Path]
     ) -> Content[LiveDetail]:
         pass
 
