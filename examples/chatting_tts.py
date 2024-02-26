@@ -19,7 +19,7 @@ async def on_connect():
 
 @client.event
 async def on_chat(message: ChatMessage):
-    tts = gtts.gTTS(text=message.content, lang='ko', slow=False)
+    tts = gtts.gTTS(text=message.content, lang="ko", slow=False)
     fp = io.BytesIO()
     tts.write_to_fp(fp)
     # WIP

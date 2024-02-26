@@ -28,4 +28,4 @@ jobs:
     - name: Analysing the code with pycodestyle
       run: python -m pycodestyle chzzkpy --max-line-length=120
     - name: Checking the code for formatted in black
-      run: python -m black --check chzzkpy
+      run: python -m black --check chzzkpy examples
