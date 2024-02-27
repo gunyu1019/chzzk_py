@@ -1,6 +1,7 @@
-import aiohttp
+# pip install discord.py
 import discord
 
+import aiohttp
 from chzzkpy.chat import ChatClient, ChatMessage
 
 
