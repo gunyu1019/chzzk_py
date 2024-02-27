@@ -13,7 +13,7 @@ import pydub.playback
 from chzzkpy.chat import ChatClient, ChatMessage
 
 # Configuration
-channel_id = "21a85ed3ac126f622a05cd670c1be535"
+channel_id = "channel_id"
 
 loop = asyncio.get_event_loop()
 client = ChatClient(channel_id, loop=loop)
