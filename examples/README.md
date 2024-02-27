@@ -13,6 +13,17 @@
 ### [Discord Webhook](discord_webhook.py)
 사용자가 입력한 채팅을 디스코드 채팅방에 실시간으로 반영됩니다.
 
+<table>
+  <tr>
+    <th>치지직</th>
+    <th>디스코드</th>
+  </tr>
+  <tr>
+    <td><img src="https://github.com/gunyu1019/chzzk_py/assets/16767890/66197543-5e51-4ab7-85b2-1f3508f49248" height="80px" /></td>
+    <td><img src="https://github.com/gunyu1019/chzzk_py/assets/16767890/5f9a5a81-28d0-451c-958f-a0f5ad4e0caa" height="80px" /></td>
+  </tr>
+</table>
+
 사용전, 아래의 과정이 필요합니다.
 1. `channel_id`에 자신의 치지직 채널 ID를 채웁니다.
 2. 패키지 discord.py (`pip install discord.py`)를 설치합니다.
@@ -22,7 +33,10 @@
 
 ### [Spotify Playlist Bot](spotify_playlist_bot.py)
 명령어를 사용하여 스포티파이 재생목록에 추가할 수 있습니다.<br/>
-ex. `$선곡 최종화`
+ex. `$선곡 [추가할 노래]`<br/>
+<img src="https://github.com/gunyu1019/chzzk_py/assets/16767890/39f4d428-5085-4cff-9abc-c7cd7cd1e15a" width="40%" />
+
+추가할 노래는 Spotify에서 검색이 되어야 합니다.
 
 시청자는 명령어를 사용하여 스트리머의 음악을 선곡할 수 있습니다.
 
