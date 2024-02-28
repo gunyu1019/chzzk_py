@@ -82,11 +82,11 @@ class Client:
         self._api_session.login(authorization_key, session_key)
         self._game_session.login(authorization_key, session_key)
 
-    async def live_status(self, channel_id: str) -> LiveStatus:
+    async def live_status(self, channel_id: str) -> Optional[LiveStatus]:
         res = await self._api_session.live_status(channel_id=channel_id)
         return res.content
 
-    async def live_detail(self, channel_id: str) -> LiveDetail:
+    async def live_detail(self, channel_id: str) -> Optional[LiveDetail]:
         res = await self._api_session.live_detail(channel_id=channel_id)
         return res.content
 
