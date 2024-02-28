@@ -22,9 +22,10 @@ SOFTWARE.
 """
 
 from typing import Any, Optional
-from pydantic import AliasChoices, computed_field, Field, PrivateAttr
 
-from .enums import ChatType, UserRole
+from pydantic import computed_field, Field, PrivateAttr
+
+from .enums import UserRole
 from ..base_model import ChzzkModel
 
 
@@ -55,8 +56,8 @@ class StreamingProperty(ChzzkModel):
     @property
     def donation_ranking_badge(self) -> Optional[Badge]:
         if (
-            self._real_time_donation_ranking_dt is None
-            or "badge" not in self._real_time_donation_ranking_dt.keys()
+                self._real_time_donation_ranking_dt is None
+                or "badge" not in self._real_time_donation_ranking_dt.keys()
         ):
             return
         return Badge.model_validate_json(self._real_time_donation_ranking_dt["badge"])

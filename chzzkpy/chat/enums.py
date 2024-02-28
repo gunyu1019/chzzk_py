@@ -21,7 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from enum import IntEnum, StrEnum
+from enum import IntEnum, Enum
 from typing import TypeVar, Any
 
 E = TypeVar("E", bound="Enum")
@@ -56,7 +56,7 @@ class ChatType(IntEnum):
     OPEN = 121
 
 
-class UserRole(StrEnum):
+class UserRole(Enum):
     common_user = "common_user"
     streamer = "streamer"
     chat_manager = "streaming_chat_manager"
