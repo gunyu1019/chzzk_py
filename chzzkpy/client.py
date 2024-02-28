@@ -23,11 +23,14 @@ SOFTWARE.
 
 import asyncio
 
-from typing import Optional, Self
+from typing import Optional, TYPE_CHECKING
 from types import TracebackType
 from .http import ChzzkAPISession, NaverGameAPISession
 from .live import LiveStatus, LiveDetail
 from .user import User
+
+if TYPE_CHECKING:
+    from typing_extensions import Self
 
 
 class Client:

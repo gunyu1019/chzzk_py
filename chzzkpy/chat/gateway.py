@@ -25,7 +25,7 @@ import asyncio
 import json
 import logging
 import time
-from typing import Any, Callable, Optional, Literal, Self, TYPE_CHECKING
+from typing import Any, Callable, Optional, Literal, TYPE_CHECKING
 
 import aiohttp
 
@@ -33,6 +33,8 @@ from .enums import ChatCmd, get_enum, ChatType
 from .error import ConnectionClosed, WebSocketClosure, ReconnectWebsocket
 
 if TYPE_CHECKING:
+    from typing_extensions import Self
+
     from .chat_client import ChatClient
     from .state import ConnectionState
 
