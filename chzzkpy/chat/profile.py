@@ -22,7 +22,6 @@ SOFTWARE.
 """
 
 from typing import Any, Optional
-
 from pydantic import computed_field, Field, PrivateAttr
 
 from .enums import UserRole

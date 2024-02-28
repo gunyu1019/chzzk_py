@@ -20,23 +20,26 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
+from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Any, Optional, Callable, Coroutine
+from typing import Any, Optional, Callable, Coroutine, TYPE_CHECKING
 
 import aiohttp
 
-from .access_token import AccessToken
 from .enums import ChatCmd
 from .gateway import ChzzkWebSocket, ReconnectWebsocket
 from .http import ChzzkChatSession
-from .message import ChatMessage
-from .recent_chat import RecentChat
 from .state import ConnectionState
 from ..client import Client
 from ..error import LoginRequired
 from ..http import ChzzkAPISession
+
+if TYPE_CHECKING:
+    from .access_token import AccessToken
+    from .message import ChatMessage
+    from .recent_chat import RecentChat
 
 _log = logging.getLogger(__name__)
 

@@ -22,7 +22,6 @@ SOFTWARE.
 """
 
 from typing import Literal, Optional
-
 from pydantic import Field
 
 from ..base_model import ChzzkModel

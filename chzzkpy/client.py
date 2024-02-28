@@ -20,16 +20,17 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
+from __future__ import annotations
 
 import asyncio
 
 from typing import Optional, TYPE_CHECKING
-from types import TracebackType
 from .http import ChzzkAPISession, NaverGameAPISession
 from .live import LiveStatus, LiveDetail
 from .user import User
 
 if TYPE_CHECKING:
+    from types import TracebackType
     from typing_extensions import Self
 
 
