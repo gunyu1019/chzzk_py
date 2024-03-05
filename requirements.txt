@@ -4,7 +4,7 @@
 #
 #    pip-compile --output-file=requirements.txt requirements.in
 #
-ahttp-client==1.0.0
+ahttp-client==1.0.1
     # via -r requirements.in
 aiohttp==3.9.3
     # via
@@ -49,13 +49,13 @@ multidict==6.0.5
     #   ahttp-client
     #   aiohttp
     #   yarl
-pydantic==2.6.2
+pydantic==2.6.3
     # via -r requirements.in
 pydantic-core==2.16.3
     # via
     #   -r requirements.in
     #   pydantic
-typing-extensions==4.9.0
+typing-extensions==4.10.0
     # via
     #   -r requirements.in
     #   pydantic
