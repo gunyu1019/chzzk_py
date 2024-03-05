@@ -23,12 +23,12 @@ SOFTWARE.
 
 import asyncio
 import functools
-import inspect
 import logging
 from typing import Annotated, Optional
 
-import aiohttp
-from async_client_decorator import Session, get, Path
+from ahttp_client import Session, get, Path
+from ahttp_client.extension import get_pydantic_response_model
+from ahttp_client.request import RequestCore
 
 from .base_model import ChzzkModel, Content
 from .error import LoginRequired
@@ -36,50 +36,6 @@ from .live import LiveStatus, LiveDetail
 from .user import User
 
 _log = logging.getLogger(__name__)
-
-
-# This decorator will remove at https://github.com/gunyu1019/async-client-decorator/issues/8
-def _response_pydantic_model_validation(func):
-    signature = inspect.signature(func)
-    if not issubclass(signature.return_annotation, ChzzkModel):
-        return func
-
-    signature = inspect.signature(func)
-
-    @functools.wraps(func)
-    async def wrapper(self: Session, response: aiohttp.ClientResponse, *_1, **_2):
-        data = await response.json()
-        validated_data = signature.return_annotation.model_validate(data)
-        return validated_data
-
-    return wrapper
-
-
-# This decorator will remove at https://github.com/gunyu1019/async-client-decorator/issues/8
-def _response_pydantic_model_validation_able(func):
-    signature = inspect.signature(func)
-    if not issubclass(signature.return_annotation, ChzzkModel):
-        return func
-
-    func.__component_parameter__.response.append("response")
-    return func
-
-
-# This decorator will remove at https://github.com/gunyu1019/async-client-decorator/issues/9
-def _custom_query_name(oldest_name, replace_name):
-    def decorator(func):
-        func.__component_parameter__.query[replace_name] = (
-            func.__component_parameter__.query.pop(oldest_name)
-        )
-
-        @functools.wraps(func)
-        def wrapper(self, *args, **kwargs):
-            kwargs[replace_name] = kwargs.pop(oldest_name)
-            return func(self, *args, **kwargs)
-
-        return wrapper
-
-    return decorator
 
 
 class ChzzkSession(Session):
@@ -98,36 +54,28 @@ class ChzzkSession(Session):
         return self._authorization_key is not None and self._session_key is not None
 
     @staticmethod
-    def login_required(func):
-        @functools.wraps(func)
-        async def wrapper(self: "ChzzkSession", *args, **kwargs):
-            if not self.has_login:
-                raise LoginRequired()
+    def configuration(login_able: bool = False, login_required: bool = False):
+        def decorator(func):
+            func.__login_able__ = login_able
+            func.__login_required__ = login_required
+            return func
 
-            return await func(self, *args, **kwargs)
+        return decorator
 
-        return wrapper
+    async def before_request(
+        self, request: RequestCore, path: str
+    ) -> tuple[RequestCore, str]:
+        _log.debug(f"Path({path}) was called.")
 
-    @staticmethod
-    def login_able(func):
-        @functools.wraps(func)
-        async def wrapper(self: "ChzzkSession", *args, **kwargs):
+        # Authorization
+        if getattr(request.func, "__login_able__", False):
             if self.has_login:
-                if "Cookie" not in func.__component_parameter__.header.keys():
-                    func.__component_parameter__.header["Cookie"] = ""
-                func.__component_parameter__.header["Cookie"] += self._token
-            return await func(self, *args, **kwargs)
-
-        return wrapper
-
-    @staticmethod
-    def logging(func):
-        @functools.wraps(func)
-        def wrapper(self: "ChzzkSession", *args, **kwargs):
-            _log.debug(f"Path({func.__request_path__}) was called.")
-            return func(self, *args, **kwargs)
-
-        return wrapper
+                if "Cookie" not in request.headers.keys():
+                    request.headers["Cookie"] = ""
+                request.headers["Cookie"] += self._token
+            elif getattr(request.func, "__login_required__", False):
+                raise LoginRequired()
+        return request, path
 
     @property
     def _token(self) -> str:
@@ -138,19 +86,15 @@ class ChzzkAPISession(ChzzkSession):
     def __init__(self, loop: Optional[asyncio.AbstractEventLoop] = None):
         super().__init__(base_url="https://api.chzzk.naver.com", loop=loop)
 
-    @_response_pydantic_model_validation_able
-    @ChzzkSession.logging
-    @get("/polling/v2/channels/{channel_id}/live-status")
-    @_response_pydantic_model_validation
+    @get_pydantic_response_model()
+    @get("/polling/v2/channels/{channel_id}/live-status", directly_response=True)
     async def live_status(
         self, channel_id: Annotated[str, Path]
     ) -> Content[LiveStatus]:
         pass
 
-    @_response_pydantic_model_validation_able
-    @ChzzkSession.logging
-    @get("/service/v2/channels/{channel_id}/live-detail")
-    @_response_pydantic_model_validation
+    @get_pydantic_response_model()
+    @get("/service/v2/channels/{channel_id}/live-detail", directly_response=True)
     async def live_detail(
         self, channel_id: Annotated[str, Path]
     ) -> Content[LiveDetail]:
@@ -161,11 +105,8 @@ class NaverGameAPISession(ChzzkSession):
     def __init__(self, loop: Optional[asyncio.AbstractEventLoop] = None):
         super().__init__(base_url="https://comm-api.game.naver.com", loop=loop)
 
-    @_response_pydantic_model_validation_able
-    @ChzzkSession.logging
-    @ChzzkSession.login_required
-    @ChzzkSession.login_able
-    @get("/nng_main/v1/user/getUserStatus")
-    @_response_pydantic_model_validation
+    @get_pydantic_response_model()
+    @get("/nng_main/v1/user/getUserStatus", directly_response=True)
+    @ChzzkSession.configuration(login_able=True, login_required=True)
     async def user(self) -> Content[User]:
         pass
