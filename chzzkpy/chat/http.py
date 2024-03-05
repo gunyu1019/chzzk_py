@@ -4,10 +4,7 @@ from typing import Annotated
 
 from .access_token import AccessToken
 from ..base_model import Content
-from ..http import (
-    ChzzkSession,
-    NaverGameAPISession
-)
+from ..http import ChzzkSession, NaverGameAPISession
 
 
 class ChzzkChatSession(NaverGameAPISession):

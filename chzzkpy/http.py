@@ -59,9 +59,12 @@ class ChzzkSession(Session):
             func.__login_able__ = login_able
             func.__login_required__ = login_required
             return func
+
         return decorator
 
-    async def before_request(self, request: RequestCore, path: str) -> tuple[RequestCore, str]:
+    async def before_request(
+        self, request: RequestCore, path: str
+    ) -> tuple[RequestCore, str]:
         _log.debug(f"Path({path}) was called.")
 
         # Authorization
