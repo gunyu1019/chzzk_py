@@ -26,13 +26,15 @@ import functools
 import logging
 from typing import Annotated, Optional
 
-from ahttp_client import Session, get, Path
+from ahttp_client import Session, get, Path, Query
 from ahttp_client.extension import get_pydantic_response_model
 from ahttp_client.request import RequestCore
 
 from .base_model import ChzzkModel, Content
+from .channel import Channel
 from .error import LoginRequired
 from .live import LiveStatus, LiveDetail
+from .search import SearchResult
 from .user import User
 
 _log = logging.getLogger(__name__)
@@ -98,6 +100,36 @@ class ChzzkAPISession(ChzzkSession):
     async def live_detail(
         self, channel_id: Annotated[str, Path]
     ) -> Content[LiveDetail]:
+        pass
+
+    @get_pydantic_response_model()
+    @get("/service/v1/search/channels")
+    async def search_channel(
+        self,
+        keyword: Annotated[str, Query],
+        offset: Annotated[int, Query] = 0,
+        size: Annotated[int, Query] = 13
+    ) -> Content[SearchResult]:
+        pass
+
+    @get_pydantic_response_model()
+    @get("/service/v1/search/lives")
+    async def search_live(
+        self,
+        keyword: Annotated[str, Query],
+        offset: Annotated[int, Query] = 0,
+        size: Annotated[int, Query] = 13
+    ) -> Content[SearchResult]:
+        pass
+
+    @get_pydantic_response_model()
+    @get("/service/v1/search/videos")
+    async def search_video(
+        self,
+        keyword: Annotated[str, Query],
+        offset: Annotated[int, Query] = 0,
+        size: Annotated[int, Query] = 13
+    ) -> Content[SearchResult]:
         pass
 
 
