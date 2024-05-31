@@ -42,7 +42,7 @@ class Video(ChzzkModel):
     read_count: int
     thumbnail_image_url: Optional[str]
     video_category: Optional[str]
-    video_category_vaule = str
+    video_category_vaule: str
 
     id: str = Field(alias='videoId')
     number: int = Field(alias='videoNo')

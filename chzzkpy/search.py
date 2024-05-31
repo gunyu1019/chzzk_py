@@ -21,7 +21,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-
+from typing import Optional
 from pydantic import BeforeValidator, Field
 
 from .base_model import ChzzkModel
@@ -31,6 +31,12 @@ from .video import Video
 
 
 class SearchResult(ChzzkModel):
-    channel: Channel
-    live: Live
-    video: Video
+    channel: Optional[Channel]
+    live: Optional[Live]
+    video: Optional[Video]
+
+
+class TopSearchResult(ChzzkModel):
+    data: list[SearchResult]
+    size: int
+    # offset: int
