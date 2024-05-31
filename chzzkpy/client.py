@@ -31,6 +31,7 @@ from .live import LiveStatus, LiveDetail
 from .user import User
 
 if TYPE_CHECKING:
+    from .channel import Channel
     from types import TracebackType
     from typing_extensions import Self
 
@@ -93,3 +94,8 @@ class Client:
     async def user(self) -> User:
         res = await self._game_session.user()
         return res.content
+    
+    async def search_channel(self, keyword: str) -> list[Channel]:
+        res = await self._api_session.search_channel(keyword=keyword)
+        data = res.content.data
+        return [x.channel for x in data]
