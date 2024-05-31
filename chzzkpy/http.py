@@ -24,7 +24,7 @@ SOFTWARE.
 import asyncio
 import functools
 import logging
-from typing import Annotated, Optional
+from typing import Annotated, Final, Optional
 
 from ahttp_client import Session, get, Path, Query
 from ahttp_client.extension import get_pydantic_response_model
@@ -34,10 +34,14 @@ from .base_model import ChzzkModel, Content
 from .channel import Channel
 from .error import LoginRequired
 from .live import LiveStatus, LiveDetail
-from .search import SearchResult
+from .search import TopSearchResult
 from .user import User
 
 _log = logging.getLogger(__name__)
+_user_agent: Final[str] = (
+    "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36"
+    "(KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36"
+)
 
 
 class ChzzkSession(Session):
@@ -77,6 +81,11 @@ class ChzzkSession(Session):
                 request.headers["Cookie"] += self._token
             elif getattr(request.func, "__login_required__", False):
                 raise LoginRequired()
+
+        # Add User-Agent to avoid blocking
+        if "User-Agent" not in request.headers:
+            request.headers["User-Agent"] = _user_agent
+
         return request, path
 
     @property
@@ -103,33 +112,33 @@ class ChzzkAPISession(ChzzkSession):
         pass
 
     @get_pydantic_response_model()
-    @get("/service/v1/search/channels")
+    @get("/service/v1/search/channels", directly_response=True)
     async def search_channel(
         self,
         keyword: Annotated[str, Query],
         offset: Annotated[int, Query] = 0,
         size: Annotated[int, Query] = 13
-    ) -> Content[SearchResult]:
+    ) -> Content[TopSearchResult]:
         pass
 
     @get_pydantic_response_model()
-    @get("/service/v1/search/lives")
+    @get("/service/v1/search/lives", directly_response=True)
     async def search_live(
         self,
         keyword: Annotated[str, Query],
         offset: Annotated[int, Query] = 0,
         size: Annotated[int, Query] = 13
-    ) -> Content[SearchResult]:
+    ) -> Content[TopSearchResult]:
         pass
 
     @get_pydantic_response_model()
-    @get("/service/v1/search/videos")
+    @get("/service/v1/search/videos", directly_response=True)
     async def search_video(
         self,
         keyword: Annotated[str, Query],
         offset: Annotated[int, Query] = 0,
         size: Annotated[int, Query] = 13
-    ) -> Content[SearchResult]:
+    ) -> Content[TopSearchResult]:
         pass
 
 
