@@ -29,7 +29,7 @@ from .base_model import ChzzkModel
 
 
 class ChannelPersonalData(ChzzkModel):
-    private_user_block: bool
+    private_user_block: bool = False
 
 
 class Channel(ChzzkModel):
@@ -42,4 +42,4 @@ class Channel(ChzzkModel):
     verified_mark: bool = False
     open_live: bool
 
-    personal_data: Optional[ChannelPersonalData]
+    personal_data: Optional[ChannelPersonalData] = None

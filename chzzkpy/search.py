@@ -31,9 +31,9 @@ from .video import Video
 
 
 class SearchResult(ChzzkModel):
-    channel: Optional[Channel]
-    live: Optional[Live]
-    video: Optional[Video]
+    channel: Optional[Channel] = None
+    live: Optional[Live] = None
+    video: Optional[Video] = None
 
 
 class TopSearchResult(ChzzkModel):
