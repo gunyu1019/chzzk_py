@@ -44,4 +44,4 @@ class ChzzkModel(BaseModel):
 class Content(ChzzkModel, Generic[T]):
     code: int
     message: Optional[str]
-    content: T
+    content: Optional[T]
