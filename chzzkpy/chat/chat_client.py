@@ -46,6 +46,9 @@ _log = logging.getLogger(__name__)
 
 
 class ChatClient(Client):
+    """Represents a client to connect Chzzk (Naver Live Streaming).
+    Addition, this class includes chat feature.
+    """
     def __init__(
         self,
         channel_id: str,
@@ -87,6 +90,15 @@ class ChatClient(Client):
         return self._ready.is_set()
 
     def run(self, authorization_key: str = None, session_key: str = None) -> None:
+        """A blocking call that abstracts away the event loop. [WIP]
+
+        Parameters
+        ----------
+        authorization_key : str
+            A `NID_AUT` value in the cookie.
+        session_key : str
+            A `NID_SES` value in the cookie.
+        """
         wrapper = self.start(authorization_key, session_key)
         try:
             self.loop.run_until_complete(wrapper)
@@ -94,6 +106,15 @@ class ChatClient(Client):
             return
 
     async def start(self, authorization_key: str = None, session_key: str = None):
+        """
+
+        Parameters
+        ----------
+        authorization_key : Optional[str]
+            A `NID_AUT` value in the cookie.
+        session_key : Optional[str]
+            A `NID_SES` value in the cookie.
+        """
         try:
             if authorization_key is not None and session_key is not None:
                 self.login(authorization_key=authorization_key, session_key=session_key)
