@@ -100,7 +100,7 @@ class DonationRank(ChzzkModel):
     ranking: int
 
 
-class DonationExtra(ExtraBase):
+class BaseDonationExtra(ExtraBase):
     is_anonymous: bool = True
     pay_type: str
     pay_amount: int = 0
@@ -109,7 +109,37 @@ class DonationExtra(ExtraBase):
     donation_user_weekly_rank: Optional[DonationRank] = None
 
 
-class DonationMessage(MessageDetail[DonationExtra]):
+class ChatDonationExtra(BaseDonationExtra):
+    donation_type: Literal['CHAT']
+    
+
+class VideoDonationExtra(BaseDonationExtra):
+    donation_type: Literal['VIDEO']
+    
+
+class MissionDonationExtra(BaseDonationExtra):
+    donation_type: Literal['VIDEO']
+    duration_time: Optional[int] = None
+    mission_donation_id: Optional[str] = None
+    mission_created_time: Optional[str] = None
+    mission_end_time: Optional[str] = None
+    mission_text: Optional[str] = None
+    status: Optional[str] = None
+    success: Optional[bool] = None
+    
+
+class DonationMessage(MessageDetail[ChatDonationExtra | VideoDonationExtra | MissionDonationExtra]):
+    pass
+
+
+class SubscriptionExtra(ExtraBase):
+    month: int
+    tier_name: str
+    nickname: str
+    tier_no: int
+
+
+class SubscriptionMessage(MessageDetail[SubscriptionExtra]):
     pass
 
 

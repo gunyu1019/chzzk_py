@@ -52,6 +52,7 @@ class ChatType(IntEnum):
     VIDEO = 4
     RICH = 5
     DONATION = 10
+    SUBSCRIPTION = 11
     SYSTEM_MESSAGE = 30
     OPEN = 121
 
