@@ -27,7 +27,7 @@ import asyncio
 
 from typing import Optional, TYPE_CHECKING
 from .http import ChzzkAPISession, NaverGameAPISession
-from .live import LiveStatus, LiveDetail
+from .live import Live, LiveStatus, LiveDetail
 from .user import User
 from .video import Video
 
@@ -110,3 +110,13 @@ class Client:
             data[i].video.channel = x.channel
          
         return [x.video for x in data]
+    
+    async def search_live(self, keyword: str) -> list[Live]:
+        res = await self._api_session.search_live(keyword=keyword)
+        data = res.content.data
+
+        # Inject Channel info
+        for i, x in enumerate(data):
+            data[i].live.channel = x.channel
+         
+        return [x.live for x in data]

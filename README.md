@@ -18,6 +18,7 @@ This library focused on chat. However, other feature will be developed.
     * 메시지 상단 고정하기 (`on_pin`, `on_unpin`)
     * 시스템 메시지 (`on_system_message`)
 * 로그인 (쿠키 값 `NID_AUT`, `NID_SES` 사용)
+* 검색 (채널, 영상, 라이브, 자동완성)
 * 방송 상태 조회
 
 ## Installation

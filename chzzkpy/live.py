@@ -23,8 +23,9 @@ SOFTWARE.
 
 import datetime
 from typing import Literal, Any, Optional
-from pydantic import Field, Json
+from pydantic import ConfigDict, Field, Json
 from .base_model import ChzzkModel
+from .channel import PartialChannel
 
 
 class LivePollingStatus(ChzzkModel):
@@ -69,7 +70,6 @@ class BaseLive(ChzzkModel):
     live_category_value: str
 
     # live_playback: Json[LivePlayback] = Field(alias="livePlaybackJson") WIP
-    live_polling_status: Json[LivePollingStatus] = Field(alias="livePollingStatusJson")
     open_date: datetime.datetime
 
     tags: list[str]
@@ -77,11 +77,19 @@ class BaseLive(ChzzkModel):
 
 # This class used at search.
 class Live(BaseLive):
+    model_config = ConfigDict(
+        frozen=False
+    )
+
     channel_id: str
+    channel: Optional[PartialChannel] = None
 
 
 class LiveDetail(BaseLive):
     status: Literal["OPEN", "CLOSE"]
+    
+    live_polling_status: Json[LivePollingStatus] = Field(alias="livePollingStatusJson")
+
     close_date: datetime.datetime
     chat_active: bool
     chat_available_group: str
