@@ -23,8 +23,9 @@ SOFTWARE.
 
 import datetime
 from typing import Literal, Any, Optional
-from pydantic import Field, Json
+from pydantic import ConfigDict, Field, Json
 from .base_model import ChzzkModel
+from .channel import PartialChannel
 
 
 class LivePollingStatus(ChzzkModel):
@@ -55,27 +56,44 @@ class LiveStatus(ChzzkModel):
     min_follower_minute: int
 
 
-class LiveDetail(ChzzkModel):
+class BaseLive(ChzzkModel):
     live_id: int
     live_title: str
-    status: Literal["OPEN", "CLOSE"]
     live_image_url: str
-    default_thumbnail_image_url: Optional[str]
-    concurrent_user_count: int
     accumulate_count: int
-    open_date: datetime.datetime
-    close_date: datetime.datetime
     adult: bool
     chat_channel_id: str
     category_type: Optional[str]
+    concurrent_user_count: int
+    default_thumbnail_image_url: Optional[str]
     live_category: str
     live_category_value: str
+
+    # live_playback: Json[LivePlayback] = Field(alias="livePlaybackJson") WIP
+    open_date: datetime.datetime
+
+    tags: list[str]
+
+
+# This class used at search.
+class Live(BaseLive):
+    model_config = ConfigDict(
+        frozen=False
+    )
+
+    channel_id: str
+    channel: Optional[PartialChannel] = None
+
+
+class LiveDetail(BaseLive):
+    status: Literal["OPEN", "CLOSE"]
+    
+    live_polling_status: Json[LivePollingStatus] = Field(alias="livePollingStatusJson")
+
+    close_date: datetime.datetime
     chat_active: bool
     chat_available_group: str
     chat_available_condition: str
     paid_promotion: bool
     min_follower_minute: int
     user_adult_status: Optional[str]
-
-    # live_playback: Json[LivePlayback] = Field(alias="livePlaybackJson") WIP
-    live_polling_status: Json[LivePollingStatus] = Field(alias="livePollingStatusJson")

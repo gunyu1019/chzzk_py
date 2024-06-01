@@ -111,6 +111,46 @@ class ChzzkAPISession(ChzzkSession):
     ) -> Content[LiveDetail]:
         pass
 
+    @get_pydantic_response_model()
+    @get("/service/v1/search/channels", directly_response=True)
+    async def search_channel(
+        self,
+        keyword: Annotated[str, Query],
+        offset: Annotated[int, Query] = 0,
+        size: Annotated[int, Query] = 13
+    ) -> Content[TopSearchResult]:
+        pass
+
+    @get_pydantic_response_model()
+    @get("/service/v1/search/lives", directly_response=True)
+    async def search_live(
+        self,
+        keyword: Annotated[str, Query],
+        offset: Annotated[int, Query] = 0,
+        size: Annotated[int, Query] = 13
+    ) -> Content[TopSearchResult]:
+        pass
+
+    @get_pydantic_response_model()
+    @get("/service/v1/search/videos", directly_response=True)
+    async def search_video(
+        self,
+        keyword: Annotated[str, Query],
+        offset: Annotated[int, Query] = 0,
+        size: Annotated[int, Query] = 13
+    ) -> Content[TopSearchResult]:
+        pass
+
+    @get_pydantic_response_model()
+    @get("/service/v1/search/channels/auto-complete", directly_response=True)
+    async def autocomplete(
+        self,
+        keyword: Annotated[str, Query],
+        offset: Annotated[int, Query] = 0,
+        size: Annotated[int, Query] = 13
+    ) -> Content[TopSearchResult]:
+        pass
+
 
 class NaverGameAPISession(ChzzkSession):
     def __init__(self, loop: Optional[asyncio.AbstractEventLoop] = None):

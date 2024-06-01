@@ -27,10 +27,12 @@ import asyncio
 
 from typing import Optional, TYPE_CHECKING
 from .http import ChzzkAPISession, NaverGameAPISession
-from .live import LiveStatus, LiveDetail
+from .live import Live, LiveStatus, LiveDetail
 from .user import User
+from .video import Video
 
 if TYPE_CHECKING:
+    from .channel import Channel
     from types import TracebackType
     from typing_extensions import Self
 
@@ -93,3 +95,33 @@ class Client:
     async def user(self) -> User:
         res = await self._game_session.user()
         return res.content
+    
+    async def search_channel(self, keyword: str) -> list[Channel]:
+        res = await self._api_session.search_channel(keyword=keyword)
+        data = res.content.data
+        return [x.channel for x in data]
+    
+    async def search_video(self, keyword: str) -> list[Video]:
+        res = await self._api_session.search_video(keyword=keyword)
+        data = res.content.data
+
+        # Inject Channel info
+        for i, x in enumerate(data):
+            data[i].video.channel = x.channel
+         
+        return [x.video for x in data]
+    
+    async def search_live(self, keyword: str) -> list[Live]:
+        res = await self._api_session.search_live(keyword=keyword)
+        data = res.content.data
+
+        # Inject Channel info
+        for i, x in enumerate(data):
+            data[i].live.channel = x.channel
+         
+        return [x.live for x in data]
+
+    async def autocomplete(self, keyword: str) -> list[str]:
+        res = await self._api_session.autocomplete(keyword=keyword)
+        data = res.content.data
+        return data
