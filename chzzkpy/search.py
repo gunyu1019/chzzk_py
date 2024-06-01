@@ -21,17 +21,17 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from typing import Optional
+from typing import Optional, Union
 from pydantic import BeforeValidator, Field
 
 from .base_model import ChzzkModel
-from .channel import Channel
+from .channel import Channel, PartialChannel
 from .live import Live
 from .video import Video
 
 
 class SearchResult(ChzzkModel):
-    channel: Optional[Channel] = None
+    channel: Optional[Channel | PartialChannel] = Field(union_mode='left_to_right')
     live: Optional[Live] = None
     video: Optional[Video] = None
 
