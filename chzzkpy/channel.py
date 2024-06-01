@@ -32,14 +32,15 @@ class ChannelPersonalData(ChzzkModel):
     private_user_block: bool = False
 
 
-class Channel(ChzzkModel):
+class PartialChannel(ChzzkModel):
     id: str = Field(alias='channelId')
     name: str = Field(alias='channelName')
-    description: str = Field(alias='channelDescription')
     image: Optional[str] = Field(alias='channelImageUrl')
-
-    follower: int = Field('followerCount')
     verified_mark: bool = False
-    open_live: bool
-
     personal_data: Optional[ChannelPersonalData] = None
+
+
+class Channel(ChzzkModel):
+    description: str = Field(alias='channelDescription')
+    follower: int = Field('followerCount')
+    open_live: bool
