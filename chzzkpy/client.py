@@ -29,6 +29,7 @@ from typing import Optional, TYPE_CHECKING
 from .http import ChzzkAPISession, NaverGameAPISession
 from .live import LiveStatus, LiveDetail
 from .user import User
+from .video import Video
 
 if TYPE_CHECKING:
     from .channel import Channel
@@ -99,3 +100,13 @@ class Client:
         res = await self._api_session.search_channel(keyword=keyword)
         data = res.content.data
         return [x.channel for x in data]
+    
+    async def search_video(self, keyword: str) -> list[Video]:
+        res = await self._api_session.search_video(keyword=keyword)
+        data = res.content.data
+
+        # Inject Channel info
+        for i, x in enumerate(data):
+            data[i].video.channel = x.channel
+         
+        return [x.video for x in data]

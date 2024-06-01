@@ -24,14 +24,20 @@ SOFTWARE.
 import datetime
 from typing import Annotated, Any, Optional
 
-from pydantic import BeforeValidator, Field
+from pydantic import BeforeValidator, ConfigDict, Field
 
 from .base_model import ChzzkModel
+from .channel import PartialChannel
 
 
 class Video(ChzzkModel):
+    model_config = ConfigDict(
+        frozen=False
+    )
+
     adult: bool
     category_type: Optional[str]
+    channel: Optional[PartialChannel] = None
     channel_id: str
     duration: int
     publish_date: Annotated[
@@ -42,9 +48,9 @@ class Video(ChzzkModel):
     read_count: int
     thumbnail_image_url: Optional[str]
     video_category: Optional[str]
-    video_category_vaule: str
+    video_category_value: str
 
-    id: str = Field(alias='videoId')
+    id: Optional[str] = Field(alias='videoId')
     number: int = Field(alias='videoNo')
     title: str = Field(alias='videoTitle')
     type: str = Field(alias='videoType')
