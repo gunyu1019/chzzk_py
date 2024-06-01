@@ -120,3 +120,8 @@ class Client:
             data[i].live.channel = x.channel
          
         return [x.live for x in data]
+
+    async def autocomplete(self, keyword: str) -> list[str]:
+        res = await self._api_session.autocomplete(keyword=keyword)
+        data = res.content.data
+        return data

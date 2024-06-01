@@ -37,6 +37,6 @@ class SearchResult(ChzzkModel):
 
 
 class TopSearchResult(ChzzkModel):
-    data: list[SearchResult]
+    data: list[str | SearchResult]
     size: int
     # offset: int
