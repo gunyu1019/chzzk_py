@@ -85,6 +85,7 @@ class Client:
 
     def login(self, authorization_key: str, session_key: str):
         """Login at Chzzk.
+        Used for features that require a login. (ex. user method)
 
         Parameters
         ----------
@@ -97,14 +98,46 @@ class Client:
         self._game_session.login(authorization_key, session_key)
 
     async def live_status(self, channel_id: str) -> Optional[LiveStatus]:
+        """Get a live status info of broadcaster.
+
+        Parameters
+        ----------
+        channel_id : str
+            The channel ID of broadcaster
+
+        Returns
+        -------
+        Optional[LiveStatus]
+            Return LiveStatus info. Sometimes the broadcaster is not broadcasting, returns None.
+        """
         res = await self._api_session.live_status(channel_id=channel_id)
         return res.content
 
     async def live_detail(self, channel_id: str) -> Optional[LiveDetail]:
+        """Get a live detail info of broadcaster.
+
+        Parameters
+        ----------
+        channel_id : str
+            The channel ID of broadcaster
+
+        Returns
+        -------
+        Optional[LiveDetail]
+            Return LiveDetail info. Sometimes the broadcaster is not broadcasting, returns None.
+        """
         res = await self._api_session.live_detail(channel_id=channel_id)
         return res.content
 
     async def user(self) -> User:
+        """Get my user info.
+        This method should be used after login.
+
+        Returns
+        -------
+        User
+            Information for logged-in user.
+        """
         res = await self._game_session.user()
         return res.content
     
@@ -170,6 +203,18 @@ class Client:
         return [x.live for x in data]
 
     async def autocomplete(self, keyword: str) -> list[str]:
+        """Get a auto-completed keyword.
+
+        Parameters
+        ----------
+        keyword : str
+            Incomplete keywords
+
+        Returns
+        -------
+        list[str]
+            Autocompleted keywords
+        """
         res = await self._api_session.autocomplete(keyword=keyword)
         data = res.content.data
         return data
