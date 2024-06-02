@@ -90,15 +90,6 @@ class ChatClient(Client):
         return self._ready.is_set()
 
     def run(self, authorization_key: str = None, session_key: str = None) -> None:
-        """A blocking call that abstracts away the event loop. [WIP]
-
-        Parameters
-        ----------
-        authorization_key : str
-            A `NID_AUT` value in the cookie.
-        session_key : str
-            A `NID_SES` value in the cookie.
-        """
         wrapper = self.start(authorization_key, session_key)
         try:
             self.loop.run_until_complete(wrapper)
@@ -106,15 +97,6 @@ class ChatClient(Client):
             return
 
     async def start(self, authorization_key: str = None, session_key: str = None):
-        """
-
-        Parameters
-        ----------
-        authorization_key : Optional[str]
-            A `NID_AUT` value in the cookie.
-        session_key : Optional[str]
-            A `NID_SES` value in the cookie.
-        """
         try:
             if authorization_key is not None and session_key is not None:
                 self.login(authorization_key=authorization_key, session_key=session_key)
@@ -301,3 +283,28 @@ class ChatClient(Client):
             "recent_chat", lambda x: len(recent_chat.message_list) <= count
         )
         return recent_chat.message_list
+    
+    async def set_notice_message(self, message: ChatMessage) -> None:
+        await self._game_session.set_notice_message(
+            channel_id=self.channel_id,
+            extras = message.extras,
+            message = message.content,
+            message_time = int(message.created_time.timestamp() * 1000),
+            message_user_id_hash = message.user_id,
+            streaming_channel_id = message.extras.streaming_channel_id
+        )
+        return
+    
+    async def delete_notice_message(self) -> None:
+        await self._game_session.delete_notice_message(channel_id=self.channel_id)
+        return
+    
+    async def blind_message(self, message: ChatMessage) -> None:
+        await self._game_session.blind_message(
+            channel_id=self.channel_id,
+            message = message.content,
+            message_time = int(message.created_time.timestamp() * 1000),
+            message_user_id_hash = message.user_id,
+            streaming_channel_id = message.extras.streaming_channel_id
+        )
+        return
