@@ -263,6 +263,18 @@ class ChatClient(Client):
 
     # Chat Method
     async def send_chat(self, message: str) -> None:
+        """Send a message.
+
+        Parameters
+        ----------
+        message : str
+            Message to Broadcasters
+
+        Raises
+        ------
+        RuntimeError
+            Occurs when the client can't connect to a broadcaster's chat
+        """
         if not self.is_connected:
             raise RuntimeError("Not connected to server. Please connect first.")
 
@@ -272,19 +284,52 @@ class ChatClient(Client):
         await self._gateway.send_chat(message, self.chat_channel_id)
 
     async def request_recent_chat(self, count: int = 50):
+        """Send a request recent chat to chzzk.
+        This method only makes a “request”.
+        If you want to get the recent chats of participants, use the `history` method.
+
+        Parameters
+        ----------
+        count : int, optional
+            Number of messages to fetch from the most recent, by default 50
+
+        Raises
+        ------
+        RuntimeError
+            Occurs when the client can't connect to a broadcaster's chat
+        """
         if not self.is_connected:
             raise RuntimeError("Not connected to server. Please connect first.")
 
         await self._gateway.request_recent_chat(count, self.chat_channel_id)
 
     async def history(self, count: int = 50) -> list[ChatMessage]:
+        """Get messages the user has previously sent. 
+
+        Parameters
+        ----------
+        count : Optional[int]
+            Number of messages to fetch from the most recent, by default 50
+
+        Returns
+        -------
+        list[ChatMessage]
+            Returns the user's most recently sent messages, in order of appearance
+        """
         await self.request_recent_chat(count)
         recent_chat: RecentChat = await self.wait_for(
-            "recent_chat", lambda x: len(recent_chat.message_list) <= count
+            "recent_chat", lambda x: len(x.message_list) <= count
         )
         return recent_chat.message_list
     
     async def set_notice_message(self, message: ChatMessage) -> None:
+        """Set a pinned messsage.
+
+        Parameters
+        ----------
+        message : ChatMessage
+            A Chat to pin.
+        """
         await self._game_session.set_notice_message(
             channel_id=self.channel_id,
             extras = message.extras,
@@ -296,10 +341,18 @@ class ChatClient(Client):
         return
     
     async def delete_notice_message(self) -> None:
+        """Delete a pinned message."""
         await self._game_session.delete_notice_message(channel_id=self.channel_id)
         return
     
     async def blind_message(self, message: ChatMessage) -> None:
+        """Blinds a chat.
+
+        Parameters
+        ----------
+        message : ChatMessage
+            A Chat to blind.
+        """
         await self._game_session.blind_message(
             channel_id=self.channel_id,
             message = message.content,
