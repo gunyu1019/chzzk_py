@@ -21,27 +21,26 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from typing import Generic, TypeVar, Optional
+from typing import Optional
 
-from pydantic import BaseModel, ConfigDict, Extra
-from pydantic.alias_generators import to_camel
+from pydantic import BeforeValidator, Field
 
-T = TypeVar("T")
-
-
-class ChzzkModel(BaseModel):
-    model_config = ConfigDict(
-        alias_generator=to_camel, frozen=True, extra=Extra.allow  # prevent exception.
-    )
-
-    @staticmethod
-    def special_date_parsing_validator(value: T) -> T:
-        if not isinstance(value, str):
-            return value
-        return value.replace("+09", "")
+from .base_model import ChzzkModel
 
 
-class Content(ChzzkModel, Generic[T]):
-    code: int
-    message: Optional[str]
-    content: Optional[T]
+class ChannelPersonalData(ChzzkModel):
+    private_user_block: bool = False
+
+
+class PartialChannel(ChzzkModel):
+    id: str = Field(alias="channelId")
+    name: str = Field(alias="channelName")
+    image: Optional[str] = Field(alias="channelImageUrl")
+    verified_mark: bool = False
+    personal_data: Optional[ChannelPersonalData] = None
+
+
+class Channel(PartialChannel):
+    description: str = Field(alias="channelDescription")
+    follower: int = Field("followerCount")
+    open_live: bool

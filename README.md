@@ -17,7 +17,9 @@ This library focused on chat. However, other feature will be developed.
     * 사용자 후원 (`on_donation`)
     * 메시지 상단 고정하기 (`on_pin`, `on_unpin`)
     * 시스템 메시지 (`on_system_message`)
+    * 메시지 관리
 * 로그인 (쿠키 값 `NID_AUT`, `NID_SES` 사용)
+* 검색 (채널, 영상, 라이브, 자동완성)
 * 방송 상태 조회
 
 ## Installation
@@ -36,6 +38,28 @@ py -3 -m pip install chzzkpy
 
 `chzzkpy`를 사용한 예제는 [Examples](examples)에서 확인하실 수 있습니다.<br/>
 아래는 간단한 예제입니다.
+
+#### 방송인 검색
+
+```py
+import asyncio
+import chzzkpy
+
+loop = asyncio.get_event_loop()
+client = chzzkpy.Client(loop=loop)
+
+async def main():
+    result = await client.search_channel("건유1019")
+    if len(result) == 0:
+        print("검색 결과가 없습니다 :(")
+        return
+    print(result[0].name)
+    print(result[0].id)
+    print(result[0].image)
+    await client.close()
+
+loop.run_until_complete(main())
+```
 
 #### 챗봇 (Chat-Bot)
 

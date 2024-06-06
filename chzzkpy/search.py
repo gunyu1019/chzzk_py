@@ -21,27 +21,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from typing import Generic, TypeVar, Optional
+from typing import Optional, Union
+from pydantic import BeforeValidator, Field
 
-from pydantic import BaseModel, ConfigDict, Extra
-from pydantic.alias_generators import to_camel
-
-T = TypeVar("T")
-
-
-class ChzzkModel(BaseModel):
-    model_config = ConfigDict(
-        alias_generator=to_camel, frozen=True, extra=Extra.allow  # prevent exception.
-    )
-
-    @staticmethod
-    def special_date_parsing_validator(value: T) -> T:
-        if not isinstance(value, str):
-            return value
-        return value.replace("+09", "")
+from .base_model import ChzzkModel
+from .channel import Channel, PartialChannel
+from .live import Live
+from .video import Video
 
 
-class Content(ChzzkModel, Generic[T]):
-    code: int
-    message: Optional[str]
-    content: Optional[T]
+class SearchResult(ChzzkModel):
+    channel: Optional[Channel | PartialChannel] = Field(union_mode="left_to_right")
+    live: Optional[Live] = None
+    video: Optional[Video] = None
+
+
+class TopSearchResult(ChzzkModel):
+    data: list[str | SearchResult]
+    size: int
+    # offset: int

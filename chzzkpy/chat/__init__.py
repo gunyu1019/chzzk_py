@@ -30,11 +30,14 @@ from .message import (
     ChatMessage,
     NoticeMessage,
     DonationMessage,
+    SubscriptionMessage,
     SystemMessage,
     Extra,
     NoticeExtra,
     SystemExtra,
-    DonationExtra,
+    ChatDonationExtra,
+    VideoDonationExtra,
+    MissionDonationExtra,
 )
 from .profile import Profile, ActivityBadge, StreamingProperty, Badge
 from .recent_chat import RecentChat

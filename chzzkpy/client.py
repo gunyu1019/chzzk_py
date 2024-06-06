@@ -27,15 +27,19 @@ import asyncio
 
 from typing import Optional, TYPE_CHECKING
 from .http import ChzzkAPISession, NaverGameAPISession
-from .live import LiveStatus, LiveDetail
+from .live import Live, LiveStatus, LiveDetail
 from .user import User
+from .video import Video
 
 if TYPE_CHECKING:
+    from .channel import Channel
     from types import TracebackType
     from typing_extensions import Self
 
 
 class Client:
+    """Represents a client to connect Chzzk (Naver Live Streaming)."""
+
     def __init__(
         self,
         loop: Optional[asyncio.AbstractEventLoop] = None,
@@ -70,26 +74,148 @@ class Client:
 
     @property
     def is_closed(self) -> bool:
+        """Indicates if the session is closed."""
         return self._closed
 
     async def close(self):
+        """Closes the connection to chzzk."""
         self._closed = True
         await self._api_session.close()
         await self._game_session.close()
         return
 
     def login(self, authorization_key: str, session_key: str):
+        """Login at Chzzk.
+        Used for features that require a login. (ex. user method)
+
+        Parameters
+        ----------
+        authorization_key : str
+            A `NID_AUT` value in the cookie.
+        session_key : str
+            A `NID_SES` value in the cookie.
+        """
         self._api_session.login(authorization_key, session_key)
         self._game_session.login(authorization_key, session_key)
 
     async def live_status(self, channel_id: str) -> Optional[LiveStatus]:
+        """Get a live status info of broadcaster.
+
+        Parameters
+        ----------
+        channel_id : str
+            The channel ID of broadcaster
+
+        Returns
+        -------
+        Optional[LiveStatus]
+            Return LiveStatus info. Sometimes the broadcaster is not broadcasting, returns None.
+        """
         res = await self._api_session.live_status(channel_id=channel_id)
         return res.content
 
     async def live_detail(self, channel_id: str) -> Optional[LiveDetail]:
+        """Get a live detail info of broadcaster.
+
+        Parameters
+        ----------
+        channel_id : str
+            The channel ID of broadcaster
+
+        Returns
+        -------
+        Optional[LiveDetail]
+            Return LiveDetail info. Sometimes the broadcaster is not broadcasting, returns None.
+        """
         res = await self._api_session.live_detail(channel_id=channel_id)
         return res.content
 
     async def user(self) -> User:
+        """Get my user info.
+        This method should be used after login.
+
+        Returns
+        -------
+        User
+            Information for logged-in user.
+        """
         res = await self._game_session.user()
         return res.content
+
+    async def search_channel(self, keyword: str) -> list[Channel]:
+        """Search the channel with keyword.
+
+        Parameters
+        ----------
+        keyword : str
+            A keyword to search channel
+
+        Returns
+        -------
+        list[Channel]
+            Returns channels with searching.
+        """
+        res = await self._api_session.search_channel(keyword=keyword)
+        data = res.content.data
+        return [x.channel for x in data]
+
+    async def search_video(self, keyword: str) -> list[Video]:
+        """Search the video with keyword.
+
+        Parameters
+        ----------
+        keyword : str
+            A keyword to search video
+
+        Returns
+        -------
+        list[Video]
+            Returns videos with searching.
+        """
+        res = await self._api_session.search_video(keyword=keyword)
+        data = res.content.data
+
+        # Inject Channel info
+        for i, x in enumerate(data):
+            data[i].video.channel = x.channel
+
+        return [x.video for x in data]
+
+    async def search_live(self, keyword: str) -> list[Live]:
+        """Search the live with keyword.
+
+        Parameters
+        ----------
+        keyword : str
+            A keyword to search live
+
+        Returns
+        -------
+        list[Video]
+            Returns lives with searching.
+        """
+        res = await self._api_session.search_live(keyword=keyword)
+        data = res.content.data
+
+        # Inject Channel info
+        for i, x in enumerate(data):
+            data[i].live.channel = x.channel
+
+        return [x.live for x in data]
+
+    async def autocomplete(self, keyword: str) -> list[str]:
+        """Get a auto-completed keyword.
+
+        Parameters
+        ----------
+        keyword : str
+            Incomplete keywords
+
+        Returns
+        -------
+        list[str]
+            Autocompleted keywords
+        """
+        res = await self._api_session.autocomplete(keyword=keyword)
+        data = res.content.data
+        return data

@@ -46,6 +46,10 @@ _log = logging.getLogger(__name__)
 
 
 class ChatClient(Client):
+    """Represents a client to connect Chzzk (Naver Live Streaming).
+    Addition, this class includes chat feature.
+    """
+
     def __init__(
         self,
         channel_id: str,
@@ -75,7 +79,9 @@ class ChatClient(Client):
         self._ready = asyncio.Event()
 
         handler = {ChatCmd.CONNECTED: self._ready.set}
-        self._connection = ConnectionState(dispatch=self.dispatch, handler=handler)
+        self._connection = ConnectionState(
+            dispatch=self.dispatch, handler=handler, client=self
+        )
         self._gateway: Optional[ChzzkWebSocket] = None
 
     def _session_initial_set(self):
@@ -84,6 +90,7 @@ class ChatClient(Client):
 
     @property
     def is_connected(self) -> bool:
+        """Specifies if the client successfully connected with chzzk."""
         return self._ready.is_set()
 
     def run(self, authorization_key: str = None, session_key: str = None) -> None:
@@ -116,6 +123,7 @@ class ChatClient(Client):
         await self.polling()
 
     async def close(self):
+        """Close the connection to chzzk."""
         self._ready.clear()
 
         if self._gateway is not None:
@@ -149,6 +157,7 @@ class ChatClient(Client):
 
     # Event Handler
     async def wait_until_connected(self) -> None:
+        """Waits until the client's internal cache is all ready."""
         await self._ready.wait()
 
     def wait_for(
@@ -157,6 +166,21 @@ class ChatClient(Client):
         check: Optional[Callable[..., bool]] = None,
         timeout: Optional[float] = None,
     ):
+        """Waits for a WebSocket event to be dispatched.
+
+        Parameters
+        ----------
+        event : str
+            The event name.
+            For a list of events, read :method:`event`
+        check : Optional[Callable[..., bool]],
+            A predicate to check what to wait for. The arguments must meet the
+            parameters of the event being waited for.
+        timeout : Optional[float]
+            The number of seconds to wait before timing out and raising
+            :exc:`asyncio.TimeoutError`.
+
+        """
         future = self.loop.create_future()
 
         if check is None:
@@ -175,6 +199,28 @@ class ChatClient(Client):
     def event(
         self, coro: Callable[..., Coroutine[Any, Any, Any]]
     ) -> Callable[..., Coroutine[Any, Any, Any]]:
+        """A decorator that registers an event to listen to.
+        The function must be corutine. Else client cause TypeError
+
+
+        A list of events that the client can listen to.
+        * `on_chat`: Called when a ChatMessage is created and sent.
+        * `on_connect`: Called when the client is done preparing the data received from Chzzk.
+        * `on_donation`: Called when a listener donates
+        * `on_system_message`: Called when a system message is created and sent.
+                            (Example. notice/blind message)
+        * `on_recent_chat`: Called when a recent chat received.
+                            This event called when `request_recent_chat` method called.
+        * `on_pin` / `on_unpin`: Called when a message pinned or unpinned.
+        * `on_blind`: Called when a message blocked.
+        * `on_client_error`: Called when client cause exception.
+
+        Example
+        -------
+        >>> @client.event
+        ... async def on_chat(message: ChatMessage):
+        ...     print(message.content)
+        """
         if not asyncio.iscoroutinefunction(coro):
             raise TypeError("function must be a coroutine.")
 
@@ -260,6 +306,18 @@ class ChatClient(Client):
 
     # Chat Method
     async def send_chat(self, message: str) -> None:
+        """Send a message.
+
+        Parameters
+        ----------
+        message : str
+            Message to Broadcasters
+
+        Raises
+        ------
+        RuntimeError
+            Occurs when the client can't connect to a broadcaster's chat
+        """
         if not self.is_connected:
             raise RuntimeError("Not connected to server. Please connect first.")
 
@@ -269,14 +327,84 @@ class ChatClient(Client):
         await self._gateway.send_chat(message, self.chat_channel_id)
 
     async def request_recent_chat(self, count: int = 50):
+        """Send a request recent chat to chzzk.
+        This method only makes a “request”.
+        If you want to get the recent chats of participants, use the `history` method.
+
+        Parameters
+        ----------
+        count : int, optional
+            Number of messages to fetch from the most recent, by default 50
+
+        Raises
+        ------
+        RuntimeError
+            Occurs when the client can't connect to a broadcaster's chat
+        """
         if not self.is_connected:
             raise RuntimeError("Not connected to server. Please connect first.")
 
         await self._gateway.request_recent_chat(count, self.chat_channel_id)
 
     async def history(self, count: int = 50) -> list[ChatMessage]:
+        """Get messages the user has previously sent.
+
+        Parameters
+        ----------
+        count : Optional[int]
+            Number of messages to fetch from the most recent, by default 50
+
+        Returns
+        -------
+        list[ChatMessage]
+            Returns the user's most recently sent messages, in order of appearance
+        """
         await self.request_recent_chat(count)
         recent_chat: RecentChat = await self.wait_for(
-            "recent_chat", lambda x: len(recent_chat.message_list) <= count
+            "recent_chat", lambda x: len(x.message_list) <= count
         )
         return recent_chat.message_list
+
+    async def set_notice_message(self, message: ChatMessage) -> None:
+        """Set a pinned messsage.
+
+        Parameters
+        ----------
+        message : ChatMessage
+            A Chat to pin.
+        """
+        await self._game_session.set_notice_message(
+            channel_id=self.chat_channel_id,
+            extras=(
+                message.extras.model_dump_json(by_alias=True)
+                if message.extras is not None
+                else "{}"
+            ),
+            message=message.content,
+            message_time=int(message.created_time.timestamp() * 1000),
+            message_user_id_hash=message.user_id,
+            streaming_channel_id=message.extras.streaming_channel_id,
+        )
+        return
+
+    async def delete_notice_message(self) -> None:
+        """Delete a pinned message."""
+        await self._game_session.delete_notice_message(channel_id=self.chat_channel_id)
+        return
+
+    async def blind_message(self, message: ChatMessage) -> None:
+        """Blinds a chat.
+
+        Parameters
+        ----------
+        message : ChatMessage
+            A Chat to blind.
+        """
+        await self._game_session.blind_message(
+            channel_id=self.chat_channel_id,
+            message=message.content,
+            message_time=int(message.created_time.timestamp() * 1000),
+            message_user_id_hash=message.user_id,
+            streaming_channel_id=message.extras.streaming_channel_id,
+        )
+        return

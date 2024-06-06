@@ -21,13 +21,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
+from __future__ import annotations
+
 import datetime
-from typing import Optional, Literal, TypeVar, Generic, Any
-from pydantic import AliasChoices, Field, Json
+import functools
+from typing import Optional, Literal, TypeVar, Generic, TYPE_CHECKING, Any
+from pydantic import AliasChoices, Field, Json, ConfigDict
 
 from .enums import ChatType
 from .profile import Profile
 from ..base_model import ChzzkModel
+
+if TYPE_CHECKING:
+    from .chat_client import ChatClient
 
 E = TypeVar("E", bound="ExtraBase")
 
@@ -81,7 +87,60 @@ class MessageDetail(Message[E], Generic[E]):
 
 
 class ChatMessage(MessageDetail[Extra]):
-    pass
+    model_config = ConfigDict(frozen=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.client: Optional[ChatClient] = None
+
+    @classmethod
+    def model_validate_with_client(
+        cls: type[ChatMessage], obj: Any, client: ChatClient
+    ) -> ChatMessage:
+        model = super().model_validate(obj)
+        model.client = client
+        return model
+
+    @staticmethod
+    def _based_client(func):
+        @functools.wraps(func)
+        async def wrapper(self: ChatMessage, *args, **kwargs):
+            if self.client is None:
+                raise RuntimeError(
+                    "This ChatMessage is intended to store message information only."
+                )
+            return await func(self, *args, **kwargs)
+
+        return wrapper
+
+    @_based_client
+    async def pin(self):
+        """Pin this message."""
+        await self.client.set_notice_message(self)
+
+    @_based_client
+    async def unpin(self):
+        """Unpin this message."""
+        await self.client.delete_notice_message(self)
+
+    @_based_client
+    async def blind(self):
+        """Blind this message."""
+        await self.client.blind_message(self)
+
+    @_based_client
+    async def send(self, message: str):
+        """Send message to broadcaster."""
+        await self.client.send_chat(message)
+
+    @property
+    def is_me(self) -> bool:
+        """Verify that this message is from a user signed in to the client."""
+        if self.client is None:
+            raise RuntimeError(
+                "This ChatMessage is intended to store message information only."
+            )
+        return self.client.user_id == self.user_id
 
 
 class NoticeExtra(Extra):
@@ -100,7 +159,7 @@ class DonationRank(ChzzkModel):
     ranking: int
 
 
-class DonationExtra(ExtraBase):
+class BaseDonationExtra(ExtraBase):
     is_anonymous: bool = True
     pay_type: str
     pay_amount: int = 0
@@ -109,7 +168,39 @@ class DonationExtra(ExtraBase):
     donation_user_weekly_rank: Optional[DonationRank] = None
 
 
-class DonationMessage(MessageDetail[DonationExtra]):
+class ChatDonationExtra(BaseDonationExtra):
+    donation_type: Literal["CHAT"]
+
+
+class VideoDonationExtra(BaseDonationExtra):
+    donation_type: Literal["VIDEO"]
+
+
+class MissionDonationExtra(BaseDonationExtra):
+    donation_type: Literal["VIDEO"]
+    duration_time: Optional[int] = None
+    mission_donation_id: Optional[str] = None
+    mission_created_time: Optional[str] = None
+    mission_end_time: Optional[str] = None
+    mission_text: Optional[str] = None
+    status: Optional[str] = None
+    success: Optional[bool] = None
+
+
+class DonationMessage(
+    MessageDetail[ChatDonationExtra | VideoDonationExtra | MissionDonationExtra]
+):
+    pass
+
+
+class SubscriptionExtra(ExtraBase):
+    month: int
+    tier_name: str
+    nickname: str
+    tier_no: int
+
+
+class SubscriptionMessage(MessageDetail[SubscriptionExtra]):
     pass
 
 

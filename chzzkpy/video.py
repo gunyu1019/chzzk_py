@@ -21,27 +21,33 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-from typing import Generic, TypeVar, Optional
+import datetime
+from typing import Annotated, Any, Optional
 
-from pydantic import BaseModel, ConfigDict, Extra
-from pydantic.alias_generators import to_camel
+from pydantic import BeforeValidator, ConfigDict, Field
 
-T = TypeVar("T")
-
-
-class ChzzkModel(BaseModel):
-    model_config = ConfigDict(
-        alias_generator=to_camel, frozen=True, extra=Extra.allow  # prevent exception.
-    )
-
-    @staticmethod
-    def special_date_parsing_validator(value: T) -> T:
-        if not isinstance(value, str):
-            return value
-        return value.replace("+09", "")
+from .base_model import ChzzkModel
+from .channel import PartialChannel
 
 
-class Content(ChzzkModel, Generic[T]):
-    code: int
-    message: Optional[str]
-    content: Optional[T]
+class Video(ChzzkModel):
+    model_config = ConfigDict(frozen=False)
+
+    adult: bool
+    category_type: Optional[str]
+    channel: Optional[PartialChannel] = None
+    channel_id: str
+    duration: int
+    publish_date: Annotated[
+        datetime.datetime, BeforeValidator(ChzzkModel.special_date_parsing_validator)
+    ]
+    # publish_date_at: int # div/1000
+    read_count: int
+    thumbnail_image_url: Optional[str]
+    video_category: Optional[str]
+    video_category_value: str
+
+    id: Optional[str] = Field(alias="videoId")
+    number: int = Field(alias="videoNo")
+    title: str = Field(alias="videoTitle")
+    type: str = Field(alias="videoType")
