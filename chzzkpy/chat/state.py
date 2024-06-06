@@ -20,15 +20,22 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
+from __future__ import annotations
 
+import logging
 import inspect
 import functools
-from typing import Callable, Any
+from typing import Callable, Any, TYPE_CHECKING, Optional
 
 from .blind import Blind
 from .enums import ChatCmd, ChatType, get_enum
 from .message import ChatMessage, DonationMessage, NoticeMessage, SystemMessage
 from .recent_chat import RecentChat
+
+if TYPE_CHECKING:
+    from .chat_client import ChatClient
+
+log = logging.getLogger()
 
 
 class ConnectionState:
@@ -36,6 +43,7 @@ class ConnectionState:
         self,
         dispatch: Callable[..., Any],
         handler: dict[ChatCmd | int, Callable[..., Any]],
+        client: Optional[ChatClient] = None
     ):
         self.dispatch = dispatch
         self.handler: dict[ChatCmd | int, Callable[..., Any]] = handler
@@ -43,6 +51,8 @@ class ConnectionState:
         for _, func in inspect.getmembers(self):
             if hasattr(func, "__parsing_event__"):
                 self.parsers[func.__parsing_event__] = func
+            
+        self.client = client
 
     @staticmethod
     def parsable(cmd: ChatCmd):
@@ -60,6 +70,7 @@ class ConnectionState:
                 return func(self, *args, **kwargs)
             except Exception as exc:
                 self.dispatch("client_error", exc, *args, **kwargs)
+                log.exception(exc)
 
         return wrapper
 
@@ -97,7 +108,7 @@ class ConnectionState:
                 validated_data = SystemMessage.model_validate(message)
                 self.dispatch("system_message", validated_data)
             elif message_type == ChatType.TEXT:
-                validated_data = ChatMessage.model_validate(message)
+                validated_data = ChatMessage.model_validate_with_client(message, client=self.client)
                 self.dispatch("chat", validated_data)
 
     @parsable(ChatCmd.CHAT)
@@ -119,8 +130,9 @@ class ConnectionState:
     @parsable(ChatCmd.NOTICE)
     @catch_exception
     def parse_notice(self, data: dict[str, Any]):
-        if not data:
+        if len(data) == 0:
             self.dispatch("unpin")
+            return
         validated_data = NoticeMessage.model_validate(data)
         self.dispatch("notice", validated_data)
         self.dispatch("pin", validated_data)
