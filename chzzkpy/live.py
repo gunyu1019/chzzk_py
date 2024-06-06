@@ -77,9 +77,7 @@ class BaseLive(ChzzkModel):
 
 # This class used at search.
 class Live(BaseLive):
-    model_config = ConfigDict(
-        frozen=False
-    )
+    model_config = ConfigDict(frozen=False)
 
     channel_id: str
     channel: Optional[PartialChannel] = None
@@ -87,7 +85,7 @@ class Live(BaseLive):
 
 class LiveDetail(BaseLive):
     status: Literal["OPEN", "CLOSE"]
-    
+
     live_polling_status: Json[LivePollingStatus] = Field(alias="livePollingStatusJson")
 
     close_date: datetime.datetime

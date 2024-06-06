@@ -49,6 +49,7 @@ class ChatClient(Client):
     """Represents a client to connect Chzzk (Naver Live Streaming).
     Addition, this class includes chat feature.
     """
+
     def __init__(
         self,
         channel_id: str,
@@ -78,7 +79,9 @@ class ChatClient(Client):
         self._ready = asyncio.Event()
 
         handler = {ChatCmd.CONNECTED: self._ready.set}
-        self._connection = ConnectionState(dispatch=self.dispatch, handler=handler, client=self)
+        self._connection = ConnectionState(
+            dispatch=self.dispatch, handler=handler, client=self
+        )
         self._gateway: Optional[ChzzkWebSocket] = None
 
     def _session_initial_set(self):
@@ -154,7 +157,7 @@ class ChatClient(Client):
 
     # Event Handler
     async def wait_until_connected(self) -> None:
-        """ Waits until the client's internal cache is all ready."""
+        """Waits until the client's internal cache is all ready."""
         await self._ready.wait()
 
     def wait_for(
@@ -214,7 +217,7 @@ class ChatClient(Client):
         -------
         >>> @client.event
         ... async def on_chat(message: ChatMessage):
-        ...     print(message.content) 
+        ...     print(message.content)
         """
         if not asyncio.iscoroutinefunction(coro):
             raise TypeError("function must be a coroutine.")
@@ -342,7 +345,7 @@ class ChatClient(Client):
         await self._gateway.request_recent_chat(count, self.chat_channel_id)
 
     async def history(self, count: int = 50) -> list[ChatMessage]:
-        """Get messages the user has previously sent. 
+        """Get messages the user has previously sent.
 
         Parameters
         ----------
@@ -359,7 +362,7 @@ class ChatClient(Client):
             "recent_chat", lambda x: len(x.message_list) <= count
         )
         return recent_chat.message_list
-    
+
     async def set_notice_message(self, message: ChatMessage) -> None:
         """Set a pinned messsage.
 
@@ -370,19 +373,23 @@ class ChatClient(Client):
         """
         await self._game_session.set_notice_message(
             channel_id=self.chat_channel_id,
-            extras = message.extras.model_dump_json(by_alias=True) if message.extras is not None else "{}",
-            message = message.content,
-            message_time = int(message.created_time.timestamp() * 1000),
-            message_user_id_hash = message.user_id,
-            streaming_channel_id = message.extras.streaming_channel_id
+            extras=(
+                message.extras.model_dump_json(by_alias=True)
+                if message.extras is not None
+                else "{}"
+            ),
+            message=message.content,
+            message_time=int(message.created_time.timestamp() * 1000),
+            message_user_id_hash=message.user_id,
+            streaming_channel_id=message.extras.streaming_channel_id,
         )
         return
-    
+
     async def delete_notice_message(self) -> None:
         """Delete a pinned message."""
         await self._game_session.delete_notice_message(channel_id=self.chat_channel_id)
         return
-    
+
     async def blind_message(self, message: ChatMessage) -> None:
         """Blinds a chat.
 
@@ -393,9 +400,9 @@ class ChatClient(Client):
         """
         await self._game_session.blind_message(
             channel_id=self.chat_channel_id,
-            message = message.content,
-            message_time = int(message.created_time.timestamp() * 1000),
-            message_user_id_hash = message.user_id,
-            streaming_channel_id = message.extras.streaming_channel_id
+            message=message.content,
+            message_time=int(message.created_time.timestamp() * 1000),
+            message_user_id_hash=message.user_id,
+            streaming_channel_id=message.extras.streaming_channel_id,
         )
         return

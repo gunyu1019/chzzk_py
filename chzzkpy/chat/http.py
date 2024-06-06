@@ -26,7 +26,7 @@ class ChzzkChatSession(NaverGameAPISession):
         self, channel_id: Annotated[str, Query.to_camel()]
     ) -> Content[AccessToken]:
         pass
-    
+
     async def query_to_json(session: Session, request: RequestCore, path: str):
         copied_request_obj = request.copy()
         body = dict()
@@ -41,8 +41,7 @@ class ChzzkChatSession(NaverGameAPISession):
     @ChzzkSession.configuration(login_able=True, login_required=True)
     @Query.default_query("chatType", "STREAMING")
     async def delete_notice_message(
-        self,
-        channel_id: Annotated[str, Query.to_camel()]
+        self, channel_id: Annotated[str, Query.to_camel()]
     ) -> Content[None]:
         pass
 

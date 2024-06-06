@@ -20,6 +20,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
+
 from __future__ import annotations
 
 import datetime
@@ -86,54 +87,59 @@ class MessageDetail(Message[E], Generic[E]):
 
 
 class ChatMessage(MessageDetail[Extra]):
-    model_config = ConfigDict(
-        frozen=False
-    )
+    model_config = ConfigDict(frozen=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.client: Optional[ChatClient] = None
 
     @classmethod
-    def model_validate_with_client(cls: type[ChatMessage], obj: Any, client: ChatClient) -> ChatMessage:
+    def model_validate_with_client(
+        cls: type[ChatMessage], obj: Any, client: ChatClient
+    ) -> ChatMessage:
         model = super().model_validate(obj)
         model.client = client
         return model
-    
+
     @staticmethod
     def _based_client(func):
         @functools.wraps(func)
         async def wrapper(self: ChatMessage, *args, **kwargs):
             if self.client is None:
-                raise RuntimeError("This ChatMessage is intended to store message information only.")
+                raise RuntimeError(
+                    "This ChatMessage is intended to store message information only."
+                )
             return await func(self, *args, **kwargs)
+
         return wrapper
-    
+
     @_based_client
     async def pin(self):
         """Pin this message."""
         await self.client.set_notice_message(self)
-    
+
     @_based_client
     async def unpin(self):
         """Unpin this message."""
         await self.client.delete_notice_message(self)
-    
+
     @_based_client
     async def blind(self):
         """Blind this message."""
         await self.client.blind_message(self)
-    
+
     @_based_client
     async def send(self, message: str):
         """Send message to broadcaster."""
         await self.client.send_chat(message)
-    
+
     @property
     def is_me(self) -> bool:
         """Verify that this message is from a user signed in to the client."""
         if self.client is None:
-            raise RuntimeError("This ChatMessage is intended to store message information only.")
+            raise RuntimeError(
+                "This ChatMessage is intended to store message information only."
+            )
         return self.client.user_id == self.user_id
 
 
@@ -163,15 +169,15 @@ class BaseDonationExtra(ExtraBase):
 
 
 class ChatDonationExtra(BaseDonationExtra):
-    donation_type: Literal['CHAT']
-    
+    donation_type: Literal["CHAT"]
+
 
 class VideoDonationExtra(BaseDonationExtra):
-    donation_type: Literal['VIDEO']
-    
+    donation_type: Literal["VIDEO"]
+
 
 class MissionDonationExtra(BaseDonationExtra):
-    donation_type: Literal['VIDEO']
+    donation_type: Literal["VIDEO"]
     duration_time: Optional[int] = None
     mission_donation_id: Optional[str] = None
     mission_created_time: Optional[str] = None
@@ -179,9 +185,11 @@ class MissionDonationExtra(BaseDonationExtra):
     mission_text: Optional[str] = None
     status: Optional[str] = None
     success: Optional[bool] = None
-    
 
-class DonationMessage(MessageDetail[ChatDonationExtra | VideoDonationExtra | MissionDonationExtra]):
+
+class DonationMessage(
+    MessageDetail[ChatDonationExtra | VideoDonationExtra | MissionDonationExtra]
+):
     pass
 
 

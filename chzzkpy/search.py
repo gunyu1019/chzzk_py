@@ -31,7 +31,7 @@ from .video import Video
 
 
 class SearchResult(ChzzkModel):
-    channel: Optional[Channel | PartialChannel] = Field(union_mode='left_to_right')
+    channel: Optional[Channel | PartialChannel] = Field(union_mode="left_to_right")
     live: Optional[Live] = None
     video: Optional[Video] = None
 

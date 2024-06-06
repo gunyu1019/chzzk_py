@@ -31,9 +31,7 @@ from .channel import PartialChannel
 
 
 class Video(ChzzkModel):
-    model_config = ConfigDict(
-        frozen=False
-    )
+    model_config = ConfigDict(frozen=False)
 
     adult: bool
     category_type: Optional[str]
@@ -41,8 +39,7 @@ class Video(ChzzkModel):
     channel_id: str
     duration: int
     publish_date: Annotated[
-        datetime.datetime,
-        BeforeValidator(ChzzkModel.special_date_parsing_validator)
+        datetime.datetime, BeforeValidator(ChzzkModel.special_date_parsing_validator)
     ]
     # publish_date_at: int # div/1000
     read_count: int
@@ -50,7 +47,7 @@ class Video(ChzzkModel):
     video_category: Optional[str]
     video_category_value: str
 
-    id: Optional[str] = Field(alias='videoId')
-    number: int = Field(alias='videoNo')
-    title: str = Field(alias='videoTitle')
-    type: str = Field(alias='videoType')
+    id: Optional[str] = Field(alias="videoId")
+    number: int = Field(alias="videoNo")
+    title: str = Field(alias="videoTitle")
+    type: str = Field(alias="videoType")

@@ -37,7 +37,7 @@ from .message import (
     SystemExtra,
     ChatDonationExtra,
     VideoDonationExtra,
-    MissionDonationExtra
+    MissionDonationExtra,
 )
 from .profile import Profile, ActivityBadge, StreamingProperty, Badge
 from .recent_chat import RecentChat

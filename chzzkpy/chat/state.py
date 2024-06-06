@@ -20,6 +20,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
+
 from __future__ import annotations
 
 import logging
@@ -43,7 +44,7 @@ class ConnectionState:
         self,
         dispatch: Callable[..., Any],
         handler: dict[ChatCmd | int, Callable[..., Any]],
-        client: Optional[ChatClient] = None
+        client: Optional[ChatClient] = None,
     ):
         self.dispatch = dispatch
         self.handler: dict[ChatCmd | int, Callable[..., Any]] = handler
@@ -51,7 +52,7 @@ class ConnectionState:
         for _, func in inspect.getmembers(self):
             if hasattr(func, "__parsing_event__"):
                 self.parsers[func.__parsing_event__] = func
-            
+
         self.client = client
 
     @staticmethod
@@ -108,7 +109,9 @@ class ConnectionState:
                 validated_data = SystemMessage.model_validate(message)
                 self.dispatch("system_message", validated_data)
             elif message_type == ChatType.TEXT:
-                validated_data = ChatMessage.model_validate_with_client(message, client=self.client)
+                validated_data = ChatMessage.model_validate_with_client(
+                    message, client=self.client
+                )
                 self.dispatch("chat", validated_data)
 
     @parsable(ChatCmd.CHAT)

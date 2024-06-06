@@ -117,7 +117,7 @@ class ChzzkAPISession(ChzzkSession):
         self,
         keyword: Annotated[str, Query],
         offset: Annotated[int, Query] = 0,
-        size: Annotated[int, Query] = 13
+        size: Annotated[int, Query] = 13,
     ) -> Content[TopSearchResult]:
         pass
 
@@ -127,7 +127,7 @@ class ChzzkAPISession(ChzzkSession):
         self,
         keyword: Annotated[str, Query],
         offset: Annotated[int, Query] = 0,
-        size: Annotated[int, Query] = 13
+        size: Annotated[int, Query] = 13,
     ) -> Content[TopSearchResult]:
         pass
 
@@ -137,7 +137,7 @@ class ChzzkAPISession(ChzzkSession):
         self,
         keyword: Annotated[str, Query],
         offset: Annotated[int, Query] = 0,
-        size: Annotated[int, Query] = 13
+        size: Annotated[int, Query] = 13,
     ) -> Content[TopSearchResult]:
         pass
 
@@ -147,7 +147,7 @@ class ChzzkAPISession(ChzzkSession):
         self,
         keyword: Annotated[str, Query],
         offset: Annotated[int, Query] = 0,
-        size: Annotated[int, Query] = 13
+        size: Annotated[int, Query] = 13,
     ) -> Content[TopSearchResult]:
         pass
 

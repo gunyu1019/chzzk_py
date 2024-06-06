@@ -39,6 +39,7 @@ if TYPE_CHECKING:
 
 class Client:
     """Represents a client to connect Chzzk (Naver Live Streaming)."""
+
     def __init__(
         self,
         loop: Optional[asyncio.AbstractEventLoop] = None,
@@ -140,7 +141,7 @@ class Client:
         """
         res = await self._game_session.user()
         return res.content
-    
+
     async def search_channel(self, keyword: str) -> list[Channel]:
         """Search the channel with keyword.
 
@@ -157,7 +158,7 @@ class Client:
         res = await self._api_session.search_channel(keyword=keyword)
         data = res.content.data
         return [x.channel for x in data]
-    
+
     async def search_video(self, keyword: str) -> list[Video]:
         """Search the video with keyword.
 
@@ -177,9 +178,9 @@ class Client:
         # Inject Channel info
         for i, x in enumerate(data):
             data[i].video.channel = x.channel
-         
+
         return [x.video for x in data]
-    
+
     async def search_live(self, keyword: str) -> list[Live]:
         """Search the live with keyword.
 
@@ -199,7 +200,7 @@ class Client:
         # Inject Channel info
         for i, x in enumerate(data):
             data[i].live.channel = x.channel
-         
+
         return [x.live for x in data]
 
     async def autocomplete(self, keyword: str) -> list[str]:
