@@ -40,7 +40,7 @@ class PartialChannel(ChzzkModel):
     personal_data: Optional[ChannelPersonalData] = None
 
 
-class Channel(ChzzkModel):
+class Channel(PartialChannel):
     description: str = Field(alias="channelDescription")
     follower: int = Field("followerCount")
     open_live: bool
