@@ -20,14 +20,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
+from __future__ import annotations
 
 import datetime
-from typing import Optional, Literal, TypeVar, Generic, Any
-from pydantic import AliasChoices, Field, Json
+import functools
+from typing import Optional, Literal, TypeVar, Generic, TYPE_CHECKING, Any
+from pydantic import AliasChoices, Field, Json, ConfigDict
 
 from .enums import ChatType
 from .profile import Profile
 from ..base_model import ChzzkModel
+
+if TYPE_CHECKING:
+    from .chat_client import ChatClient
 
 E = TypeVar("E", bound="ExtraBase")
 
@@ -81,7 +86,50 @@ class MessageDetail(Message[E], Generic[E]):
 
 
 class ChatMessage(MessageDetail[Extra]):
-    pass
+    model_config = ConfigDict(
+        frozen=False
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.client: Optional[ChatClient] = None
+
+    @classmethod
+    def model_validate_with_client(cls: type[ChatMessage], obj: Any, client: ChatClient) -> ChatMessage:
+        model = super().model_validate(obj)
+        model.client = client
+        return model
+    
+    @staticmethod
+    def _based_client(func):
+        @functools.wraps(func)
+        async def wrapper(self: ChatMessage, *args, **kwargs):
+            if self.client is None:
+                raise RuntimeError("This ChatMessage is intended to store message information only.")
+            return await func(self, *args, **kwargs)
+        return wrapper
+    
+    @_based_client
+    async def pin(self):
+        await self.client.set_notice_message(self)
+    
+    @_based_client
+    async def unpin(self):
+        await self.client.delete_notice_message(self)
+    
+    @_based_client
+    async def blind(self):
+        await self.client.blind_message(self)
+    
+    @_based_client
+    async def send(self, message: str):
+        await self.client.send_chat(message)
+    
+    @property
+    def is_me(self) -> bool:
+        if self.client is None:
+            raise RuntimeError("This ChatMessage is intended to store message information only.")
+        return self.client.user_id == self.user_id
 
 
 class NoticeExtra(Extra):
