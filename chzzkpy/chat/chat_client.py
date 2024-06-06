@@ -207,8 +207,10 @@ class ChatClient(Client):
         * `on_chat`: Called when a ChatMessage is created and sent.
         * `on_connect`: Called when the client is done preparing the data received from Chzzk.
         * `on_donation`: Called when a listener donates
-        * `on_system_message`: Called when a system message is created and sent. (Example. notice/blind message)
-        * `on_recent_chat`: Called when a recent chat received. This event called when `request_recent_chat` method called.
+        * `on_system_message`: Called when a system message is created and sent.
+                            (Example. notice/blind message)
+        * `on_recent_chat`: Called when a recent chat received.
+                            This event called when `request_recent_chat` method called.
         * `on_pin` / `on_unpin`: Called when a message pinned or unpinned.
         * `on_blind`: Called when a message blocked.
         * `on_client_error`: Called when client cause exception.
