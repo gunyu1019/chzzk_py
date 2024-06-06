@@ -78,7 +78,7 @@ class ChatClient(Client):
         self._ready = asyncio.Event()
 
         handler = {ChatCmd.CONNECTED: self._ready.set}
-        self._connection = ConnectionState(dispatch=self.dispatch, handler=handler)
+        self._connection = ConnectionState(dispatch=self.dispatch, handler=handler, client=self)
         self._gateway: Optional[ChzzkWebSocket] = None
 
     def _session_initial_set(self):
@@ -152,6 +152,7 @@ class ChatClient(Client):
 
     # Event Handler
     async def wait_until_connected(self) -> None:
+        """ Waits until the client's internal cache is all ready."""
         await self._ready.wait()
 
     def wait_for(
@@ -160,6 +161,21 @@ class ChatClient(Client):
         check: Optional[Callable[..., bool]] = None,
         timeout: Optional[float] = None,
     ):
+        """Waits for a WebSocket event to be dispatched.
+
+        Parameters
+        ----------
+        event : str
+            The event name.
+            For a list of events, read :method:`event`
+        check : Optional[Callable[..., bool]],
+            A predicate to check what to wait for. The arguments must meet the
+            parameters of the event being waited for.
+        timeout : Optional[float]
+            The number of seconds to wait before timing out and raising
+            :exc:`asyncio.TimeoutError`.
+
+        """
         future = self.loop.create_future()
 
         if check is None:
@@ -178,6 +194,26 @@ class ChatClient(Client):
     def event(
         self, coro: Callable[..., Coroutine[Any, Any, Any]]
     ) -> Callable[..., Coroutine[Any, Any, Any]]:
+        """A decorator that registers an event to listen to.
+        The function must be corutine. Else client cause TypeError
+
+
+        A list of events that the client can listen to.
+        * `on_chat`: Called when a ChatMessage is created and sent.
+        * `on_connect`: Called when the client is done preparing the data received from Chzzk.
+        * `on_donation`: Called when a listener donates
+        * `on_system_message`: Called when a system message is created and sent. (Example. notice/blind message)
+        * `on_recent_chat`: Called when a recent chat received. This event called when `request_recent_chat` method called.
+        * `on_pin` / `on_unpin`: Called when a message pinned or unpinned.
+        * `on_blind`: Called when a message blocked.
+        * `on_client_error`: Called when client cause exception.
+
+        Example
+        -------
+        >>> @client.event
+        ... async def on_chat(message: ChatMessage):
+        ...     print(message.content) 
+        """
         if not asyncio.iscoroutinefunction(coro):
             raise TypeError("function must be a coroutine.")
 
@@ -331,8 +367,8 @@ class ChatClient(Client):
             A Chat to pin.
         """
         await self._game_session.set_notice_message(
-            channel_id=self.channel_id,
-            extras = message.extras,
+            channel_id=self.chat_channel_id,
+            extras = message.extras.model_dump_json(by_alias=True) if message.extras is not None else "{}",
             message = message.content,
             message_time = int(message.created_time.timestamp() * 1000),
             message_user_id_hash = message.user_id,
@@ -342,7 +378,7 @@ class ChatClient(Client):
     
     async def delete_notice_message(self) -> None:
         """Delete a pinned message."""
-        await self._game_session.delete_notice_message(channel_id=self.channel_id)
+        await self._game_session.delete_notice_message(channel_id=self.chat_channel_id)
         return
     
     async def blind_message(self, message: ChatMessage) -> None:
@@ -354,7 +390,7 @@ class ChatClient(Client):
             A Chat to blind.
         """
         await self._game_session.blind_message(
-            channel_id=self.channel_id,
+            channel_id=self.chat_channel_id,
             message = message.content,
             message_time = int(message.created_time.timestamp() * 1000),
             message_user_id_hash = message.user_id,
