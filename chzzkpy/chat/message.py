@@ -111,22 +111,27 @@ class ChatMessage(MessageDetail[Extra]):
     
     @_based_client
     async def pin(self):
+        """Pin this message."""
         await self.client.set_notice_message(self)
     
     @_based_client
     async def unpin(self):
+        """Unpin this message."""
         await self.client.delete_notice_message(self)
     
     @_based_client
     async def blind(self):
+        """Blind this message."""
         await self.client.blind_message(self)
     
     @_based_client
     async def send(self, message: str):
+        """Send message to broadcaster."""
         await self.client.send_chat(message)
     
     @property
     def is_me(self) -> bool:
+        """Verify that this message is from a user signed in to the client."""
         if self.client is None:
             raise RuntimeError("This ChatMessage is intended to store message information only.")
         return self.client.user_id == self.user_id
