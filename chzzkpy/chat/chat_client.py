@@ -87,6 +87,7 @@ class ChatClient(Client):
 
     @property
     def is_connected(self) -> bool:
+        """Specifies if the client successfully connected with chzzk."""
         return self._ready.is_set()
 
     def run(self, authorization_key: str = None, session_key: str = None) -> None:
@@ -119,6 +120,7 @@ class ChatClient(Client):
         await self.polling()
 
     async def close(self):
+        """Close the connection to chzzk."""
         self._ready.clear()
 
         if self._gateway is not None:
