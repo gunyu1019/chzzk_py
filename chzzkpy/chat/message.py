@@ -44,7 +44,7 @@ class ExtraBase(ChzzkModel):
 
 class Extra(ExtraBase):
     chat_type: str
-    emojis: Any
+    emojis: Optional[Any] = None
     os_type: Literal["PC", "AOS", "IOS"]
     streaming_channel_id: str
 
