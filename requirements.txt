@@ -15,7 +15,7 @@ aiosignal==1.3.1
     #   -r requirements.in
     #   ahttp-client
     #   aiohttp
-annotated-types==0.6.0
+annotated-types==0.7.0
     # via
     #   -r requirements.in
     #   pydantic
@@ -49,13 +49,13 @@ multidict==6.0.5
     #   ahttp-client
     #   aiohttp
     #   yarl
-pydantic==2.6.3
+pydantic==2.8.2
     # via -r requirements.in
-pydantic-core==2.16.3
+pydantic-core==2.20.1
     # via
     #   -r requirements.in
     #   pydantic
-typing-extensions==4.10.0
+typing-extensions==4.12.2
     # via
     #   -r requirements.in
     #   pydantic
