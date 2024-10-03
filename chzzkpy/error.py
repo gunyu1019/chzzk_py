@@ -22,6 +22,13 @@ SOFTWARE.
 """
 
 
-class LoginRequired(Exception):
+class ChzzkpyException(Exception):
+    pass
+
+
+class LoginRequired(ChzzkpyException):
     def __init__(self):
-        super(LoginRequired, self).__init__("Login Required")
+        super().__init__(
+            "This method(feature) needs to login. Please use `login()` method."
+        )
+
