@@ -23,6 +23,14 @@ SOFTWARE.
 
 import aiohttp
 from typing import Optional
+from ..error import ChzzkpyException
+
+
+class ChatConnectFailed(ChzzkpyException):
+    def __init__(self, channel_id: str):
+        super(ChatConnectFailed, self).__init__(
+            f"ChatId cannot found. Check channel({channel_id}) is on air"
+        )
 
 
 class ConnectionClosed(Exception):
