@@ -21,6 +21,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
+from typing import Optional, Any
+from .base_model import Content
+
 
 class ChzzkpyException(Exception):
     pass
@@ -28,7 +31,22 @@ class ChzzkpyException(Exception):
 
 class LoginRequired(ChzzkpyException):
     def __init__(self):
-        super().__init__(
+        super(LoginRequired, self).__init__(
             "This method(feature) needs to login. Please use `login()` method."
         )
 
+
+class NotFound(ChzzkpyException):
+    def __init__(self, message: Optional[str]):
+        if message is None:
+            message = "Not Found"
+        super(NotFound, self).__init__(message)
+
+
+class HTTPException(ChzzkpyException):
+    def __init__(self, response: Content[Any]):
+        if response.message is None:
+            message = f"Reponsed error code ({response.code})"
+        else:
+            message = f"{response.message} ({response.code})"
+        super(HTTPException, self).__init__(message)
