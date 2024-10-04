@@ -89,19 +89,13 @@ class ChzzkSession(Session):
 
         return request, path
 
-    async def after_request(
-        self,
-        response: aiohttp.ClientResponse
-    ):
+    async def after_request(self, response: aiohttp.ClientResponse):
         if response.status == 404:
             data = await response.json()
             raise NotFound(data.get("message"))
         elif response.status >= 400:
             data = await response.json()
-            raise HTTPException(
-                code=data["code"],
-                message=data["message"]
-            )
+            raise HTTPException(code=data["code"], message=data["message"])
         return response
 
     @property
