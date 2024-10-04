@@ -30,6 +30,7 @@ from typing import Any, Optional, Callable, Coroutine, TYPE_CHECKING
 import aiohttp
 
 from .enums import ChatCmd
+from .error import ChatConnectFailed
 from .gateway import ChzzkWebSocket, ReconnectWebsocket
 from .http import ChzzkChatSession
 from .state import ConnectionState
@@ -111,6 +112,8 @@ class ChatClient(Client):
     async def connect(self) -> None:
         if self.chat_channel_id is None:
             status = await self.live_status(channel_id=self.channel_id)
+            if status is None:
+                raise ChatConnectFailed()
             self.chat_channel_id = status.chat_channel_id
 
         if self._game_session.has_login:
