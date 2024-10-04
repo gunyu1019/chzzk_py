@@ -37,16 +37,16 @@ class LoginRequired(ChzzkpyException):
 
 
 class NotFound(ChzzkpyException):
-    def __init__(self, message: Optional[str]):
+    def __init__(self, message: Optional[str] = None):
         if message is None:
             message = "Not Found"
         super(NotFound, self).__init__(message)
 
 
 class HTTPException(ChzzkpyException):
-    def __init__(self, response: Content[Any]):
-        if response.message is None:
-            message = f"Reponsed error code ({response.code})"
+    def __init__(self, code: int, message: Optional[str] = None):
+        if message is None:
+            message = f"Reponsed error code ({code})"
         else:
-            message = f"{response.message} ({response.code})"
+            message += f" ({code})"
         super(HTTPException, self).__init__(message)
