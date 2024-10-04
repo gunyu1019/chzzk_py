@@ -22,6 +22,7 @@ SOFTWARE.
 """
 
 import asyncio
+import aiohttp
 import functools
 import logging
 from typing import Annotated, Final, Optional
@@ -32,7 +33,7 @@ from ahttp_client.request import RequestCore
 
 from .base_model import ChzzkModel, Content
 from .channel import Channel
-from .error import LoginRequired
+from .error import LoginRequired, HTTPException, NotFound
 from .live import LiveStatus, LiveDetail
 from .search import TopSearchResult
 from .user import User
@@ -88,6 +89,21 @@ class ChzzkSession(Session):
 
         return request, path
 
+    async def after_request(
+        self,
+        response: aiohttp.ClientResponse
+    ):
+        if response.status == 404:
+            data = await response.json()
+            raise NotFound(data.get("message"))
+        elif response.status >= 400:
+            data = await response.json()
+            raise HTTPException(
+                code=data["code"],
+                message=data["message"]
+            )
+        return response
+
     @property
     def _token(self) -> str:
         return f"NID_SES={self._session_key}; NID_AUT={self._authorization_key}"
@@ -101,7 +117,7 @@ class ChzzkAPISession(ChzzkSession):
     @get("/polling/v2/channels/{channel_id}/live-status", directly_response=True)
     async def live_status(
         self, channel_id: Annotated[str, Path]
-    ) -> Content[LiveStatus]:
+    ) -> Content[Optional[LiveStatus]]:
         pass
 
     @get_pydantic_response_model()
