@@ -145,3 +145,12 @@ class ConnectionState:
     def parse_blind(self, data: dict[str, Any]):
         validated_data = Blind.model_validate(data)
         self.dispatch("blind", validated_data)
+
+    @parsable(ChatCmd.EVENT)
+    @catch_exception
+    def parse_event(self, data: dict[str, Any]):  # For mission donation handler
+        event_type = data.get('type')
+
+        if event_type == "DONATION_MISSION_IN_PROGRESS":
+            return
+        return
