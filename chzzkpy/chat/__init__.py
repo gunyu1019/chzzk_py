@@ -24,6 +24,11 @@ SOFTWARE.
 from .blind import Blind
 from .chat_client import ChatClient
 from .connected import ConnectedInfo
+from .donation import (
+    ChatDonation,
+    VideoDonation,
+    MissionDonation,
+)
 from .enums import ChatType, ChatCmd, UserRole
 from .error import *
 from .message import (
@@ -33,11 +38,11 @@ from .message import (
     SubscriptionMessage,
     SystemMessage,
     Extra,
-    NoticeExtra,
-    SystemExtra,
     ChatDonationExtra,
     VideoDonationExtra,
     MissionDonationExtra,
+    NoticeExtra,
+    SystemExtra,
 )
 from .profile import Profile, ActivityBadge, StreamingProperty, Badge
 from .recent_chat import RecentChat
