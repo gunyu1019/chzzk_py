@@ -20,6 +20,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
+import datetime
 
 from __future__ import annotations
 
@@ -58,9 +59,10 @@ class MissionDonation(BaseDonation):
     donation_type: Literal["MISSION"]
     duration_time: Optional[int] = None
     mission_donation_id: Optional[str] = None
-    mission_created_time: Optional[str] = None
-    mission_end_time: Optional[str] = None
+    mission_created_time: Optional[datetime.datetime] = None
+    mission_start_time: Optional[datetime.datetime] = None
+    mission_end_time: Optional[datetime.datetime] = None
     mission_text: Optional[str] = None
 
-    status: Optional[str] = None  # PENDING / REJECTED / ALLOW
+    status: Optional[str] = None  # PENDING / REJECTED / APPROVED
     success: Optional[bool] = None
