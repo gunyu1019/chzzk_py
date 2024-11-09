@@ -20,9 +20,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
-import datetime
-
 from __future__ import annotations
+
+import datetime
 
 from typing import Optional, Literal
 from pydantic import AliasChoices, Field
@@ -57,12 +57,14 @@ class VideoDonation(BaseDonation):
 
 class MissionDonation(BaseDonation):
     donation_type: Literal["MISSION"]
-    duration_time: Optional[int] = None
+    duration_time: int = 0
     mission_donation_id: Optional[str] = None
-    mission_created_time: Optional[datetime.datetime] = None
+    mission_donation_type: Optional[str] = None  # ALONE ?
+
+    mission_created_time: datetime.datetime
     mission_start_time: Optional[datetime.datetime] = None
     mission_end_time: Optional[datetime.datetime] = None
-    mission_text: Optional[str] = None
+    mission_text: str
 
-    status: Optional[str] = None  # PENDING / REJECTED / APPROVED
-    success: Optional[bool] = None
+    status: str | Literal['PENDING', 'REJECTED', 'APPROVED', 'COMPLETED'] = None  # PENDING / REJECTED / APPROVED / COMPLETED
+    success: bool = False
