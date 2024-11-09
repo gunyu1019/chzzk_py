@@ -177,19 +177,33 @@ class VideoDonationExtra(BaseDonationExtra):
 
 
 class MissionDonationExtra(BaseDonationExtra):
-    donation_type: Literal["VIDEO"]
+    donation_type: Literal["MISSION"]
     duration_time: Optional[int] = None
     mission_donation_id: Optional[str] = None
     mission_created_time: Optional[str] = None
     mission_end_time: Optional[str] = None
     mission_text: Optional[str] = None
     status: Optional[str] = None
+
+
+class MissionDonation(ChzzkModel):
+    mission_donation_id: str
+    mission_created_time: datetime.datetime
+    mission_end_time: datetime.datetime
+    mission_text: str
+    status: str
+    success: bool
+    duration_time: int
+
+
+class MissionDonationMessage(MessageDetail[MissionDonationExtra]):
+    mission: MissionDonation
     success: Optional[bool] = None
 
 
 class DonationMessage(
     MessageDetail[ChatDonationExtra | VideoDonationExtra | MissionDonationExtra]
-):
+    MessageDetail[ChatDonationExtra | VideoDonationExtra | MissionDonationExtra | MissionDonationMessage]
     pass
 
 

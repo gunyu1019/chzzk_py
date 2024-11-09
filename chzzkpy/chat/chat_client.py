@@ -207,6 +207,10 @@ class ChatClient(Client):
 
 
         A list of events that the client can listen to.
+        * `on_mission_request`: Called when a mission donation is requested.
+        * `on_mission_deny`: Called when a mission donation is denied.
+        * `on_mission_allow`: Called when a mission donation is allowed.
+        * `on_mission_success`: Called when a mission donation is successful.
         * `on_chat`: Called when a ChatMessage is created and sent.
         * `on_connect`: Called when the client is done preparing the data received from Chzzk.
         * `on_donation`: Called when a listener donates

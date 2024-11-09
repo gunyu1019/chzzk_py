@@ -51,6 +51,7 @@ class ChatType(IntEnum):
     STICKER = 3
     VIDEO = 4
     RICH = 5
+    MISSION_DONATION = 12
     DONATION = 10
     SUBSCRIPTION = 11
     SYSTEM_MESSAGE = 30
