@@ -34,6 +34,13 @@ python3 -m pip install chzzkpy
 py -3 -m pip install chzzkpy
 ```
 
+To install the development version.
+```bash
+$ git clone https://github.com/gunyu1019/chzzk_py
+$ chzzk_py
+$ python3 -m pip install -U .
+```
+
 ## Quick Example
 
 `chzzkpy`를 사용한 예제는 [Examples](examples)에서 확인하실 수 있습니다.<br/>
