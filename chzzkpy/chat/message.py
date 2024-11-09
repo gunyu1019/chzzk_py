@@ -177,13 +177,14 @@ class VideoDonationExtra(BaseDonationExtra):
 
 
 class MissionDonationExtra(BaseDonationExtra):
-    donation_type: Literal["VIDEO"]
+    donation_type: Literal["MISSION"]
     duration_time: Optional[int] = None
     mission_donation_id: Optional[str] = None
     mission_created_time: Optional[str] = None
     mission_end_time: Optional[str] = None
     mission_text: Optional[str] = None
-    status: Optional[str] = None
+
+    status: Optional[str] = None  # PENDING / REJECTED / ALLOW
     success: Optional[bool] = None
 
 
