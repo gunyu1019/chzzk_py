@@ -29,6 +29,7 @@ import functools
 from typing import Callable, Any, TYPE_CHECKING, Optional
 
 from .blind import Blind
+from .donation import MissionDonation
 from .enums import ChatCmd, ChatType, get_enum
 from .message import ChatMessage, DonationMessage, NoticeMessage, SystemMessage
 from .recent_chat import RecentChat
@@ -152,5 +153,13 @@ class ConnectionState:
         event_type = data.get('type')
 
         if event_type == "DONATION_MISSION_IN_PROGRESS":
-            return
+            validated_data = MissionDonation.model_validate(data)
+            if validated_data.status == "COMPLETE":
+                self.dispatch("mission_complete", validated_data)
+            elif validated_data.status == "PENDING":
+                self.dispatch("mission_pending", validated_data)
+            elif validated_data.status == "APPROVED":
+                self.dispatch("mission_approved", validated_data)
+            elif validated_data.status == "REJECTED":
+                self.dispatch("mission_rejected", validated_data)
         return
