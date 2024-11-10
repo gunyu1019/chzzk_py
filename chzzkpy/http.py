@@ -25,7 +25,7 @@ import asyncio
 import aiohttp
 import functools
 import logging
-from typing import Annotated, Final, Optional
+from typing import Annotated, Final, Optional, Literal
 
 from ahttp_client import Session, get, post, put, delete, Path, Query
 from ahttp_client.extension import get_pydantic_response_model
@@ -171,19 +171,10 @@ class ChzzkAPISession(ChzzkSession):
         pass
 
     # Manage Feature
-    @get_pydantic_response_model()
-    @post("/manage/v1/channels/{channel_id}/temporary-restrict-users", directory_response=True)
-    async def manage_temporary_restrict(
-        self,
-        channel_id: Annotated[str, Path],
-        chat_channel_id: Annotated[str, Query.to_camel()],
-        target_id: Annotated[str, Query.to_camel()]
-    ) -> Content[ParticleUser]:
-        pass
 
     @get_pydantic_response_model()
     @post("/manage/v1/channels/{channel_id}/temporary-restrict-users", directory_response=True)
-    async def manage_temporary_restrict(
+    async def temporary_restrict(
         self,
         channel_id: Annotated[str, Path],
         chat_channel_id: Annotated[str, Query.to_camel()],
@@ -193,7 +184,7 @@ class ChzzkAPISession(ChzzkSession):
     
     @get_pydantic_response_model()
     @post("/manage/v1/channels/{channel_id}/restrict-users", directory_response=True)
-    async def manage_restrict(
+    async def restrict(
         self,
         channel_id: Annotated[str, Path],
         target_id: Annotated[str, Query.to_camel()]
@@ -202,11 +193,33 @@ class ChzzkAPISession(ChzzkSession):
     
     @get_pydantic_response_model()
     @delete("/manage/v1/channels/{channel_id}/restrict-users/{target_id}", directory_response=True)
-    async def manage_remove_restrict(
+    async def remove_restrict(
         self,
         channel_id: Annotated[str, Path],
         target_id: Annotated[str, Path]
     ) -> Content[ParticleUser]:
+        pass
+    
+    @get_pydantic_response_model()
+    @post("/manage/v1/channels/{channel_id}/streaming-roles", directory_response=True)
+    async def set_role(
+        self,
+        channel_id: Annotated[str, Path],
+        target_id: Annotated[str, Query.to_camel()],
+        user_role_type: Annotated[
+            Literal['streaming_chat_manager', 'streaming_channel_manager'],
+            Query.to_camel()
+        ],
+    ) -> Content[ParticleUser]:
+        pass
+    
+    @get_pydantic_response_model()
+    @delete("/manage/v1/channels/{channel_id}/streaming-roles/{target_id}", directory_response=True)
+    async def remove_role(
+        self,
+        channel_id: Annotated[str, Path],
+        target_id: Annotated[str, Path],
+    ) -> Content[None]:
         pass
 
 
