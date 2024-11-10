@@ -40,6 +40,10 @@ class ProhibitWord(ChzzkModel):
     prohibit_word_no: int
 
 
+class ProhibitWordResponse(ChzzkModel):
+    prohibit_words: list[ProhibitWord]
+
+
 class Stream(ChzzkModel):
     stream_key: str
     stream_seq: int
