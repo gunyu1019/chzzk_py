@@ -36,7 +36,7 @@ from .message import (
     DonationMessage,
     NoticeMessage,
     SubscriptionMessage,
-    SystemMessage
+    SystemMessage,
 )
 from .recent_chat import RecentChat
 
@@ -159,7 +159,7 @@ class ConnectionState:
     @parsable(ChatCmd.EVENT)
     @catch_exception
     def parse_event(self, data: dict[str, Any]):  # For mission donation handler
-        event_type = data.get('type')
+        event_type = data.get("type")
 
         if event_type == "DONATION_MISSION_IN_PROGRESS":
             validated_data = MissionDonation.model_validate(data)
