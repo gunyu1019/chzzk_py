@@ -44,3 +44,11 @@ class Stream(ChzzkModel):
     stream_key: str
     stream_seq: int
     stream_url: str
+
+
+class ChatAcitivityCount(ChzzkModel):
+    chat_message_count: int
+    restrict: bool
+    restrict_count: int
+    temporary_restrict: bool
+    temporary_restrict_count: int
