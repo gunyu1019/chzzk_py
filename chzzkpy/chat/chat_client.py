@@ -29,6 +29,8 @@ from typing import Any, Optional, Callable, Coroutine, TYPE_CHECKING
 
 import aiohttp
 
+from chzzkpy.live import LiveDetail, LiveStatus
+
 from .enums import ChatCmd
 from .error import ChatConnectFailed
 from .gateway import ChzzkWebSocket, ReconnectWebsocket
@@ -411,3 +413,13 @@ class ChatClient(Client):
             streaming_channel_id=message.extras.streaming_channel_id,
         )
         return
+    
+    async def live_status(self, channel_id: Optional[str] = None) -> Optional[LiveStatus]:
+        if channel_id is None:
+            channel_id = self.channel_id
+        return await super().live_status(channel_id)
+    
+    async def live_detail(self, channel_id: Optional[str] = None) -> Optional[LiveDetail]:
+        if channel_id is None:
+            channel_id = self.channel_id
+        return await super().live_detail(channel_id)
