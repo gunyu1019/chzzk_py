@@ -274,6 +274,23 @@ class ChzzkAPISession(ChzzkSession):
         channel_id: Annotated[str, Path],
     ) -> Content[Stream]:
         pass
+    
+    @get_pydantic_response_model()
+    @get("/manage/v1/channels/{channel_id}/chat-rules", directory_response=True)
+    async def get_chat_rule(
+        self,
+        channel_id: Annotated[str, Path],
+    ) -> Content[ChatRule]:
+        pass
+    
+    @get_pydantic_response_model()
+    @put("/manage/v1/channels/{channel_id}/chat-rules", directory_response=True)
+    async def set_chat_rule(
+        self,
+        channel_id: Annotated[str, Path],
+        rule: Annotated[str, Query.to_camel()]
+    ) -> Content[None]:
+        pass
 
 
 class NaverGameAPISession(ChzzkSession):
