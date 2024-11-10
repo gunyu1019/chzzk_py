@@ -36,7 +36,7 @@ from .channel import Channel
 from .error import LoginRequired, HTTPException, NotFound
 from .live import LiveStatus, LiveDetail
 from .search import TopSearchResult
-from .user import User
+from .user import ParticleUser, User
 
 _log = logging.getLogger(__name__)
 _user_agent: Final[str] = (
@@ -97,6 +97,15 @@ class ChzzkSession(Session):
             data = await response.json()
             raise HTTPException(code=data["code"], message=data["message"])
         return response
+
+    async def query_to_json(session: Session, request: RequestCore, path: str):
+        copied_request_obj = request.copy()
+        body = dict()
+        for key, value in request.params.copy().items():
+            body[key] = value
+        copied_request_obj.params = dict()
+        copied_request_obj.body = body
+        return copied_request_obj, path
 
     @property
     def _token(self) -> str:
@@ -160,7 +169,6 @@ class ChzzkAPISession(ChzzkSession):
         size: Annotated[int, Query] = 13,
     ) -> Content[TopSearchResult]:
         pass
-
 
 class NaverGameAPISession(ChzzkSession):
     def __init__(self, loop: Optional[asyncio.AbstractEventLoop] = None):

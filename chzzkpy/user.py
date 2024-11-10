@@ -33,6 +33,7 @@ class ParticleUser(ChzzkModel):
     user_id_hash: Optional[str]
     nickname: Optional[str]
     profile_image_url: Optional[str]
+    verified_mark: bool
 
 
 class User(ParticleUser):
@@ -43,5 +44,4 @@ class User(ParticleUser):
         Optional[datetime.datetime],
         BeforeValidator(ChzzkModel.special_date_parsing_validator),
     ]  # Example: YYYY-MM-DDTHH:MM:SS.SSS+09
-    verified_mark: bool
     logged_in: Optional[bool]
