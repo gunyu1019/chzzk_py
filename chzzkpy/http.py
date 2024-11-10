@@ -34,7 +34,7 @@ from ahttp_client.request import RequestCore
 from .base_model import ChzzkModel, Content
 from .channel import Channel
 from .error import LoginRequired, HTTPException, NotFound
-from .manage import ProhibitWordResponse, ChatRule
+from .manage import ProhibitWordResponse, ChatRule, Stream
 from .live import LiveStatus, LiveDetail
 from .search import TopSearchResult
 from .user import ParticleUser, User
@@ -265,6 +265,14 @@ class ChzzkAPISession(ChzzkSession):
         prohibit_word_number: Annotated[str, Path],
         prohibit_word: Annotated[str, Query.to_camel()]
     ) -> Content[None]:
+        pass
+    
+    @get_pydantic_response_model()
+    @get("/manage/v1/channels/{channel_id}/streams", directory_response=True)
+    async def stream(
+        self,
+        channel_id: Annotated[str, Path],
+    ) -> Content[Stream]:
         pass
 
 
