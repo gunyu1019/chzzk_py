@@ -173,8 +173,8 @@ class DonationMessage(
 class SubscriptionExtra(ExtraBase):
     month: int
     tier_name: str
-    nickname: str
-    tier_no: int
+    nickname: Optional[str] = None
+    tier_no: Optional[int] = None
 
 
 class SubscriptionMessage(MessageDetail[SubscriptionExtra]):
