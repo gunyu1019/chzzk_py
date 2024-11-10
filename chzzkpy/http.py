@@ -34,6 +34,7 @@ from ahttp_client.request import RequestCore
 from .base_model import ChzzkModel, Content
 from .channel import Channel
 from .error import LoginRequired, HTTPException, NotFound
+from .manage import ProhibitWordResponse, ChatRule
 from .live import LiveStatus, LiveDetail
 from .search import TopSearchResult
 from .user import ParticleUser, User
@@ -219,6 +220,50 @@ class ChzzkAPISession(ChzzkSession):
         self,
         channel_id: Annotated[str, Path],
         target_id: Annotated[str, Path],
+    ) -> Content[None]:
+        pass
+    
+    @get_pydantic_response_model()
+    @get("/manage/v1/channels/{channel_id}/chats/prohibit-words", directory_response=True)
+    async def get_prohibit_words(
+        self,
+        channel_id: Annotated[str, Path],
+    ) -> Content[ProhibitWordResponse]:
+        pass
+    
+    @get_pydantic_response_model()
+    @post("/manage/v1/channels/{channel_id}/chats/prohibit-words", directory_response=True)
+    async def add_prohibit_word(
+        self,
+        channel_id: Annotated[str, Path],
+        prohibit_word: Annotated[str, Query.to_camel()]
+    ) -> Content[None]:
+        pass
+    
+    @get_pydantic_response_model()
+    @delete("/manage/v1/channels/{channel_id}/chats/prohibit-words/{prohibit_word_number}", directory_response=True)
+    async def remove_prohibit_word(
+        self,
+        channel_id: Annotated[str, Path],
+        prohibit_word_number: Annotated[str, Path]
+    ) -> Content[None]:
+        pass
+    
+    @get_pydantic_response_model()
+    @delete("/manage/v1/channels/{channel_id}/chats/prohibit-words", directory_response=True)
+    async def remove_prohibit_word_all(
+        self,
+        channel_id: Annotated[str, Path],
+    ) -> Content[None]:
+        pass
+    
+    @get_pydantic_response_model()
+    @put("/manage/v1/channels/{channel_id}/chats/prohibit-words/{prohibit_word_number}", directory_response=True)
+    async def edit_prohibit_word_all(
+        self,
+        channel_id: Annotated[str, Path],
+        prohibit_word_number: Annotated[str, Path],
+        prohibit_word: Annotated[str, Query.to_camel()]
     ) -> Content[None]:
         pass
 
