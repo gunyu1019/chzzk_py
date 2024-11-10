@@ -1,17 +1,29 @@
-.. chzzkpy documentation master file, created by
-   sphinx-quickstart on Sun Nov 10 04:01:52 2024.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+chzzkpy
+=======
+파이썬 기반의 치지직(네이버 라이브 스트리밍 서비스)의 비공식 라이브러리 입니다.
+An unofficial python library for Chzzk(Naver Live Streaming Service).
 
-chzzkpy documentation
-=====================
+Feature
+* Chatting in live.
+* Search broadcaster, live, video.
+* Lookup a live of broadcaster.
+* (WIP) Manage broadcast.
 
-Add your content using ``reStructuredText`` syntax. See the
-`reStructuredText <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html>`_
-documentation for details.
+Installation
+------------
 
+**Python 3.10 or higher is required.**
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+.. code::
+   # Linux/MacOS
+   python3 -m pip install chzzkpy
 
+   # Windows
+   py -3 -m pip install chzzkpy
+
+To install the development version.
+
+.. code::
+   $ git clone https://github.com/gunyu1019/chzzk_py
+   $ chzzk_py
+   $ python3 -m pip install -U .
