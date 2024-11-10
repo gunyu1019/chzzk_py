@@ -6,6 +6,12 @@ Client
 
 .. autoclass:: chzzkpy.chat.ChatClient
    :members:
+   :show-inheritance:
+
+Event
+-----
+
+.. method:: on_chat(message: ChatMessage)
 
 Enumrate
 --------
