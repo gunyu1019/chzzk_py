@@ -38,3 +38,9 @@ class ProhibitWord(ChzzkModel):
     nickname: str
     prohibit_word: str
     prohibit_word_no: int
+
+
+class Stream(ChzzkModel):
+    stream_key: str
+    stream_seq: int
+    stream_url: str
