@@ -30,7 +30,13 @@ from typing import Callable, Any, TYPE_CHECKING, Optional
 
 from .blind import Blind
 from .enums import ChatCmd, ChatType, get_enum
-from .message import ChatMessage, DonationMessage, NoticeMessage, SystemMessage
+from .message import (
+    ChatMessage,
+    DonationMessage,
+    NoticeMessage,
+    SubscriptionMessage,
+    SystemMessage
+)
 from .recent_chat import RecentChat
 
 if TYPE_CHECKING:
@@ -113,6 +119,9 @@ class ConnectionState:
                     message, client=self.client
                 )
                 self.dispatch("chat", validated_data)
+            elif message_type == ChatType.SUBSCRIPTION:
+                validated_data = SubscriptionMessage.model_validate(message)
+                self.dispatch("subscription", validated_data)
 
     @parsable(ChatCmd.CHAT)
     @catch_exception
