@@ -27,7 +27,7 @@ import functools
 import logging
 from typing import Annotated, Final, Optional
 
-from ahttp_client import Session, get, Path, Query
+from ahttp_client import Session, get, post, Path, Query
 from ahttp_client.extension import get_pydantic_response_model
 from ahttp_client.request import RequestCore
 
@@ -169,6 +169,18 @@ class ChzzkAPISession(ChzzkSession):
         size: Annotated[int, Query] = 13,
     ) -> Content[TopSearchResult]:
         pass
+
+    # Manage Feature
+    @get_pydantic_response_model()
+    @post("/manage/v1/channels/{channel_id}/temporary-restrict-users", directory_response=True)
+    async def manage_temporary_restrict(
+        self,
+        channel_id: Annotated[str, Path],
+        chat_channel_id: Annotated[str, Query.to_camel()],
+        target_id: Annotated[str, Query.to_camel()]
+    ) -> Content[ParticleUser]:
+        pass
+
 
 class NaverGameAPISession(ChzzkSession):
     def __init__(self, loop: Optional[asyncio.AbstractEventLoop] = None):
