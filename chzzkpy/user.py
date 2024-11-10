@@ -29,11 +29,14 @@ from pydantic import BeforeValidator
 from .base_model import ChzzkModel
 
 
-class User(ChzzkModel):
-    has_profile: bool
+class ParticleUser(ChzzkModel):
     user_id_hash: Optional[str]
     nickname: Optional[str]
     profile_image_url: Optional[str]
+
+
+class User(ParticleUser):
+    has_profile: bool
     penalties: Optional[list[Any]]  # typing: ???
     official_noti_agree: bool
     official_noti_agree_updated_date: Annotated[
