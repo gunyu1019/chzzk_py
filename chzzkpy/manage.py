@@ -31,3 +31,10 @@ from .base_model import ChzzkModel
 class ChatRule(ChzzkModel):
     channel_id: str
     rule: str
+
+
+class ProhibitWord(ChzzkModel):
+    created_date: datetime.datetime
+    nickname: str
+    prohibit_word: str
+    prohibit_word_no: int
