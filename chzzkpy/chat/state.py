@@ -154,8 +154,8 @@ class ConnectionState:
 
         if event_type == "DONATION_MISSION_IN_PROGRESS":
             validated_data = MissionDonation.model_validate(data)
-            if validated_data.status == "COMPLETE":
-                self.dispatch("mission_complete", validated_data)
+            if validated_data.status == "COMPLETED":
+                self.dispatch("mission_completed", validated_data)
             elif validated_data.status == "PENDING":
                 self.dispatch("mission_pending", validated_data)
             elif validated_data.status == "APPROVED":
