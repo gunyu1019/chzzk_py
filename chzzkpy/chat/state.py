@@ -29,6 +29,7 @@ import functools
 from typing import Callable, Any, TYPE_CHECKING, Optional
 
 from .blind import Blind
+from .donation import MissionDonation
 from .enums import ChatCmd, ChatType, get_enum
 from .message import (
     ChatMessage,
@@ -154,3 +155,20 @@ class ConnectionState:
     def parse_blind(self, data: dict[str, Any]):
         validated_data = Blind.model_validate(data)
         self.dispatch("blind", validated_data)
+
+    @parsable(ChatCmd.EVENT)
+    @catch_exception
+    def parse_event(self, data: dict[str, Any]):  # For mission donation handler
+        event_type = data.get('type')
+
+        if event_type == "DONATION_MISSION_IN_PROGRESS":
+            validated_data = MissionDonation.model_validate(data)
+            if validated_data.status == "COMPLETED":
+                self.dispatch("mission_completed", validated_data)
+            elif validated_data.status == "PENDING":
+                self.dispatch("mission_pending", validated_data)
+            elif validated_data.status == "APPROVED":
+                self.dispatch("mission_approved", validated_data)
+            elif validated_data.status == "REJECTED":
+                self.dispatch("mission_rejected", validated_data)
+        return

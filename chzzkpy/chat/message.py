@@ -28,6 +28,7 @@ import functools
 from typing import Optional, Literal, TypeVar, Generic, TYPE_CHECKING, Any
 from pydantic import AliasChoices, Field, Json, ConfigDict
 
+from .donation import BaseDonation, ChatDonation, VideoDonation, MissionDonation
 from .enums import ChatType
 from .profile import Profile
 from ..base_model import ChzzkModel
@@ -35,7 +36,7 @@ from ..base_model import ChzzkModel
 if TYPE_CHECKING:
     from .chat_client import ChatClient
 
-E = TypeVar("E", bound="ExtraBase")
+E = TypeVar("E", bound="ExtraBase | BaseDonation")
 
 
 class ExtraBase(ChzzkModel):
@@ -151,41 +152,16 @@ class NoticeMessage(Message[NoticeExtra]):
     pass
 
 
-class DonationRank(ChzzkModel):
-    user_id_hash: str
-    nickname: str = Field(validation_alias=AliasChoices("nickname", "nickName"))
-    verified_mark: bool
-    donation_amount: int
-    ranking: int
+class ChatDonationExtra(ChatDonation):
+    pass
 
 
-class BaseDonationExtra(ExtraBase):
-    is_anonymous: bool = True
-    pay_type: str
-    pay_amount: int = 0
-    donation_type: str
-    weekly_rank_list: Optional[list[DonationRank]] = Field(default_factory=list)
-    donation_user_weekly_rank: Optional[DonationRank] = None
+class VideoDonationExtra(VideoDonation):
+    pass
 
 
-class ChatDonationExtra(BaseDonationExtra):
-    donation_type: Literal["CHAT"]
-
-
-class VideoDonationExtra(BaseDonationExtra):
-    donation_type: Literal["VIDEO"]
-
-
-class MissionDonationExtra(BaseDonationExtra):
-    donation_type: Literal["MISSION"]
-    duration_time: Optional[int] = None
-    mission_donation_id: Optional[str] = None
-    mission_created_time: Optional[str] = None
-    mission_end_time: Optional[str] = None
-    mission_text: Optional[str] = None
-
-    status: Optional[str] = None  # PENDING / REJECTED / ALLOW
-    success: Optional[bool] = None
+class MissionDonationExtra(MissionDonation):
+    pass
 
 
 class DonationMessage(
