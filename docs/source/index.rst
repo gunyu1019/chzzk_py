@@ -32,11 +32,11 @@ To install the development version.
    $ python3 -m pip install -U .
 
 .. toctree::
-   :maxdepth: 4
-   :hidden:
+   :maxdepth: 2
    :glob:
+   :hidden:
    :caption: Table of Contents
 
-   self
-   basic
-   chat
+   Introduction <self>
+   Basic Feature <basic>
+   Chat Feature <chat>
