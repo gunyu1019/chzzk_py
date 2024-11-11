@@ -31,6 +31,15 @@ from .channel import PartialChannel
 
 
 class Video(ChzzkModel):
+    """_summary_
+
+    Attributes
+    -----------
+    adult
+        Whether the video is adult-oriented.
+    category_type: Optional[str]
+        The video's type
+    """
     model_config = ConfigDict(frozen=False)
 
     adult: bool
