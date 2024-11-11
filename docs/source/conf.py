@@ -24,6 +24,7 @@ release = 'v1.0.3'
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
+    "sphinx_copybutton"
 ]
 add_module_names = False
 
@@ -37,6 +38,7 @@ language = 'en'
 
 html_theme = 'sphinxawesome_theme'
 html_static_path = ['_static']
+html_css_files = ["custom_theme.css"]
 
 ## Template Option
 html_title = "chzzkpy"

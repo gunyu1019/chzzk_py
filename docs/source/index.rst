@@ -5,10 +5,10 @@ Introduction
 
 **Feature**
 
-- Chatting in live.
-- Search broadcaster, live, video.
-- Lookup a live of broadcaster.
-- (WIP) Manage broadcast.
+* Chatting in live.
+* Search broadcaster, live, video.
+* Lookup a live of broadcaster.
+* (WIP) Manage broadcast.
 
 Installation
 ------------

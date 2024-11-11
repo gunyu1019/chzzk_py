@@ -1,0 +1,3 @@
+#content ul:not(.search) p, #content ul:not(.search)>li {
+    margin-top: 0 !important;
+}
