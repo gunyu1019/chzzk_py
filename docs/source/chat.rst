@@ -7,14 +7,15 @@ Client
 .. autoclass:: chzzkpy.chat.ChatClient
    :members:
    :show-inheritance:
+   :exclude-members: event
 
-Event
------
+Event Refenence
+---------------
 
 .. method:: on_chat(message: ChatMessage)
 
-Enumrate
---------
+Enumerations
+------------
 .. autoclass:: chzzkpy.chat.UserRole()
    :members:
    :undoc-members:
