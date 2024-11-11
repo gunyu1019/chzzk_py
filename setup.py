@@ -12,7 +12,7 @@ if not version:
     raise RuntimeError("version is not set")
 
 
-extras_require = {"test": ["pytest", "pytest-cov"], "lint": ["pycodestyle", "black"], "docs": ["Sphinx", "furo"]}
+extras_require = {"test": ["pytest", "pytest-cov"], "lint": ["pycodestyle", "black"], "docs": ["Sphinx", "sphinxawesome-theme"]}
 
 setup(
     name="chzzkpy",
