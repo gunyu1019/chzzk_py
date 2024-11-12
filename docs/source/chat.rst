@@ -12,7 +12,50 @@ Client
 Event Refenence
 ---------------
 
-.. method:: on_chat(message: ChatMessage)
+This section describes the events listened that :class:`ChatClient<chzzkpy.chat.ChatClient>` received.
+You can received event with decorator `event` method.
+
+For example:
+.. code-block:: python
+   >>> @client.event
+   ... async def on_chat(message: ChatMessage):
+   ...     print(message.content)
+
+All event method must be a coroutine. Otherwise, unexpected errors may occur.
+
+.. py:function:: on_chat(message: ChatMessage)
+   :async:
+
+   Call when a :class:`ChatMesage<chzzkpy.chat.ChatMessage>` is created and sent.
+   
+   :param ChatMessage message: The current message.
+
+.. py:function:: on_connect()
+   :async:
+
+   Called when the client has successfully connected to chzzk chat.
+
+.. py:function:: on_donation(donation: DonationMessage)
+   :async:
+
+   Called when a broadcaster received donation.
+   Donation types include Chat, Video, and Mission, which are all invoked.
+
+   :param DonationMessage message: The message included donation info.
+
+.. py:function:: on_system_message(system_message: SystemMessage)
+   :async:
+
+   Called when a :class:`SystemMessage<chzzkpy.chat.SystemMessage>` is created and sent.
+
+   :param SystemMessage message: The system message.
+
+.. py:function:: on_subscription(subscription: SubscriptionMessage)
+   :async:
+
+   Called when a broadcast participant registered a new subscription.
+
+   :param SubscriptionMessage message: The message included subscription info.
 
 Enumerations
 ------------
@@ -129,17 +172,18 @@ Message Extra
    :undoc-members:
    :show-inheritance:
 
-.. autoclass:: chzzkpy.chat.VideoDonation()
+.. autoclass:: chzzkpy.chat.VideoDonationExtra()
    :members:
    :exclude-members: model_computed_fields, model_config, model_fields
    :undoc-members:
    :show-inheritance:
 
-.. autoclass:: chzzkpy.chat.MissionDonation()
+.. autoclass:: chzzkpy.chat.MissionDonationExtra()
    :members:
    :exclude-members: model_computed_fields, model_config, model_fields
    :undoc-members:
    :show-inheritance:
+   :no-index:
 
 .. autoclass:: chzzkpy.chat.SubscriptionExtra()
    :members:
@@ -193,6 +237,14 @@ Recent Chat
 
 Exceptions
 ----------
-.. autoclass:: chzzkpy.chat.UserRole()
-   :members:
-   :undoc-members:
+The `Chat Features` exceptions section describes exceptions that can be thrown by `ChatClient`. 
+Exceptions that occur in the `Basic Features` exceptions section can also occur.
+
+
+.. autoexception:: chzzkpy.chat.ChatConnectFailed()
+
+.. autoexception:: chzzkpy.chat.ConnectionClosed()
+
+.. autoexception:: chzzkpy.chat.WebSocketClosure()
+
+.. autoexception:: chzzkpy.chat.ReconnectWebsocket()
