@@ -24,9 +24,14 @@ release = 'v1.0.3'
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
-    "sphinx_copybutton"
+    'sphinx.ext.intersphinx',
 ]
 add_module_names = False
+
+intersphinx_mapping = {
+  'py': ('https://docs.python.org/3', None),
+  'aio': ('https://docs.aiohttp.org/en/stable/', None)
+}
 
 templates_path = ['_templates']
 exclude_patterns = []
