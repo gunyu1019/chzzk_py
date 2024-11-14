@@ -35,26 +35,22 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Initalize Integrate
-        run: |
-          mkdir ko
-          mkdir en
       - name: Download artifact (language = ko)
         uses: actions/download-artifact@v4
         with:
           name: docs-ko
-          path: ./ko
+          path: ./docs/build/ko
       - name: Download artifact (language = en)
         uses: actions/download-artifact@v4
         with:
           name: docs-en
-          path: ./en
+          path: ./docs/build/en
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Upload integrated artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./
+          path: ./docs/build/
   deploy:
     environment:
       name: github-pages
