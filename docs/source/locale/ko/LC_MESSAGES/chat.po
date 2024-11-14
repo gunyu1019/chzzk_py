@@ -351,7 +351,7 @@ msgstr "Enumerations"
 
 #: ../../source/chat.rst:136
 msgid "Blind"
-msgstr "블라인드 (Blind)"
+msgstr "Blind"
 
 
 #: ../../source/chat.rst:137
