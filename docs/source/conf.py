@@ -47,3 +47,6 @@ html_css_files = ["custom_theme.css"]
 
 ## Template Option
 html_title = "chzzkpy"
+html_sidebars = {
+  "**": ["sidebar_main_nav_links.html", "global_sidebar_toc.html"]
+}
