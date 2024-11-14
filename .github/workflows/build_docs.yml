@@ -35,19 +35,23 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Download distribution packages (language = ko)
+      - name: Initalize Integrate
+        run: |
+          mkdir ko
+          mkdir en
+      - name: Download artifact (language = ko)
         uses: actions/download-artifact@v4
         with:
           name: docs-ko
           path: /ko
-      - name: Download distribution packages (language = en)
+      - name: Download artifact (language = en)
         uses: actions/download-artifact@v4
         with:
           name: docs-en
           path: /en
       - name: Setup Pages
         uses: actions/configure-pages@v4
-      - name: Upload artifact
+      - name: Upload integrated artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: /
