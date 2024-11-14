@@ -211,57 +211,57 @@ msgid ""
 msgstr ""
 
 #: ../../source/chat.rst:76
-msgid "The notice message that a broadcaster pinned."
+msgid "고정한 메시지가 담긴 객체입니다."
 msgstr ""
 
 #: ../../source/chat.rst:82
-msgid "Called when a broadcaster removed a pin message."
+msgid "고정된 메시지가 삭제되면 호출되는 이벤트 함수입니다."
 msgstr ""
 
 #: ../../source/chat.rst:84
-msgid "The notice message that a broadcaster un-pinned."
+msgid "고정이 해제된 메시지가 담긴 객체입니다."
 msgstr ""
 
 #: ../../source/chat.rst:90
-msgid "Called when a broadcaster or manager blinded a chat."
+msgid "채팅 운영자가 메시지를 삭제하면 호출하는 함수입니다."
 msgstr ""
 
 #: ../../source/chat.rst:92
-msgid "The blinded message."
+msgid "삭제된 메시지가 담긴 객체입니다."
 msgstr ""
 
 #: ../../source/chat.rst:97
-msgid "Called when a broadcaster completed a mission."
+msgid "방송인이 미션을 성공하면 호출되는 이벤트 함수입니다."
 msgstr ""
 
 #: ../../source/chat.rst:99 ../../source/chat.rst:106
-msgid "The mission donation that a broadcaster cleared."
+msgid "성공한 미션 정보가 담긴 객체입니다."
 msgstr ""
 
 #: ../../source/chat.rst:104
-msgid "Called when a broadcast participant created a new mission."
+msgid "방송인이 새로운 미션을 요청받으면 호출되는 이벤트 함수입니다."
 msgstr ""
 
 #: ../../source/chat.rst:111
-msgid "Called when a broadcaster approved a mission."
+msgid "요청받은 미션을 방송인이 승인하면 호출되는 이벤트 함수입니다."
 msgstr ""
 
 #: ../../source/chat.rst:113
-msgid "The mission donation that a broadcaster approved."
+msgid "승인된 미션 정보가 담긴 객체입니다."
 msgstr ""
 
 #: ../../source/chat.rst:118
-msgid "Called when a broadcaster rejected a mission."
+msgid "요청받은 미션을 방송인이 거부하면 호출되는 이벤트 함수입니다."
 msgstr ""
 
 #: ../../source/chat.rst:120
-msgid "The mission donation that a broadcaster rejected."
+msgid "거절된 미션 정보가 담긴 객체입니다."
 msgstr ""
 
 #: ../../source/chat.rst:125
 msgid ""
-"Called when an event hanlder raised exception. The `*args` and `**kwargs`"
-" argument includes event handler arguments."
+"이벤트 호출간에 예외가 발생하면 호출되는 이벤트 함수입니다. `*args`과 `**kwargs`"
+"에는 예외가 발생한 이벤트 함수의 인수(Parameter) 값이 들어있습니다."
 msgstr ""
 
 #: ../../source/chat.rst:129
@@ -269,13 +269,12 @@ msgid "Enumerations"
 msgstr ""
 
 #: ../../source/chat.rst:136
-msgid "Blind"
+msgid "블라인드 (Blind)"
 msgstr ""
 
 #: ../../source/chat.rst:137
 msgid ""
-"This model is used in the `on_blind` event handler, which contains the "
-"blinded message."
+"이 데이터 모델은 `on_blind` 이벤트 함수를 호출하는 데 사용됩니다."
 msgstr ""
 
 #: ../../source/chat.rst:145
@@ -288,7 +287,7 @@ msgstr ""
 
 #: chzzkpy.chat.donation.ChatDonation:1 chzzkpy.chat.donation.MissionDonation:1
 #: chzzkpy.chat.donation.VideoDonation:1 of
-msgid "Bases: :py:class:`~chzzkpy.chat.donation.BaseDonation`"
+msgid "상위 클래스: :py:class:`~chzzkpy.chat.donation.BaseDonation`"
 msgstr ""
 
 #: ../../source/chat.rst:184
@@ -297,51 +296,51 @@ msgstr ""
 
 #: chzzkpy.chat.message.MessageDetail:1 of
 msgid ""
-"Bases: :py:class:`~chzzkpy.chat.message.Message`, "
+"상위 클래스: :py:class:`~chzzkpy.chat.message.Message`, "
 ":py:class:`~typing.Generic`\\ [:py:obj:`~chzzkpy.chat.message.E`]"
 msgstr ""
 
 #: chzzkpy.chat.message.ChatMessage:1 of
-msgid "Bases: :py:class:`~chzzkpy.chat.message.MessageDetail[Extra]`"
+msgid "상위 클래스: :py:class:`~chzzkpy.chat.message.MessageDetail[Extra]`"
 msgstr ""
 
 #: chzzkpy.chat.message.ChatMessage.blind:1 of
-msgid "Blind this message."
+msgid "채팅 운영자의 권한으로 메시지를 삭제합니다."
 msgstr ""
 
 #: chzzkpy.chat.ChatMessage.is_me:1 of
-msgid "Verify that this message is from a user signed in to the client."
+msgid "메시지가 자신이 보낸 메시지인지 확인합니다. 로그인이 필요한 기능입니다."
 msgstr ""
 
 #: chzzkpy.chat.message.ChatMessage.pin:1 of
-msgid "Pin this message."
+msgid "메시지를 고정합니다."
 msgstr ""
 
 #: chzzkpy.chat.message.ChatMessage.send:1 of
-msgid "Send message to broadcaster."
+msgid "방송인의 채널에 메시지를 보냅니다."
 msgstr ""
 
 #: chzzkpy.chat.message.ChatMessage.unpin:1 of
-msgid "Unpin this message."
+msgid "메시지 고정을 해제합니다."
 msgstr ""
 
 #: chzzkpy.chat.message.NoticeMessage:1 of
-msgid "Bases: :py:class:`~chzzkpy.chat.message.Message[NoticeExtra]`"
+msgid "상위 클래스: :py:class:`~chzzkpy.chat.message.Message[NoticeExtra]`"
 msgstr ""
 
 #: chzzkpy.chat.message.DonationMessage:1 of
 msgid ""
-"Bases: "
+"상위 클래스: "
 ":py:class:`~chzzkpy.chat.message.MessageDetail[Union[ChatDonationExtra, "
 "VideoDonationExtra, MissionDonationExtra]]`"
 msgstr ""
 
 #: chzzkpy.chat.message.SubscriptionMessage:1 of
-msgid "Bases: :py:class:`~chzzkpy.chat.message.MessageDetail[SubscriptionExtra]`"
+msgid "상위 클래스: :py:class:`~chzzkpy.chat.message.MessageDetail[SubscriptionExtra]`"
 msgstr ""
 
 #: chzzkpy.chat.message.SystemMessage:1 of
-msgid "Bases: :py:class:`~chzzkpy.chat.message.MessageDetail[SystemExtra]`"
+msgid "상위 클래스: :py:class:`~chzzkpy.chat.message.MessageDetail[SystemExtra]`"
 msgstr ""
 
 #: ../../source/chat.rst:227
@@ -349,28 +348,28 @@ msgid "Message Extra"
 msgstr ""
 
 #: chzzkpy.chat.message.NoticeExtra:1 of
-msgid "Bases: :py:class:`~chzzkpy.chat.message.Extra`"
+msgid "상위 클래스: :py:class:`~chzzkpy.chat.message.Extra`"
 msgstr ""
 
 #: chzzkpy.chat.message.ChatDonationExtra:1 of
-msgid "Bases: :py:class:`~chzzkpy.chat.donation.ChatDonation`"
+msgid "상위 클래스: :py:class:`~chzzkpy.chat.donation.ChatDonation`"
 msgstr ""
 
 #: chzzkpy.chat.message.VideoDonationExtra:1 of
-msgid "Bases: :py:class:`~chzzkpy.chat.donation.VideoDonation`"
+msgid "상위 클래스: :py:class:`~chzzkpy.chat.donation.VideoDonation`"
 msgstr ""
 
 #: chzzkpy.chat.message.MissionDonationExtra:1 of
-msgid "Bases: :py:class:`~chzzkpy.chat.donation.MissionDonation`"
+msgid "상위 클래스: :py:class:`~chzzkpy.chat.donation.MissionDonation`"
 msgstr ""
 
 #: chzzkpy.chat.message.SubscriptionExtra:1 chzzkpy.chat.message.SystemExtra:1
 #: of
-msgid "Bases: :py:class:`~chzzkpy.chat.message.ExtraBase`"
+msgid "상위 클래스: :py:class:`~chzzkpy.chat.message.ExtraBase`"
 msgstr ""
 
 #: chzzkpy.chat.message.SystemExtraParameter:1 of
-msgid "Bases: :py:class:`~chzzkpy.base_model.ChzzkModel`"
+msgid "상위 클래스: :py:class:`~chzzkpy.base_model.ChzzkModel`"
 msgstr ""
 
 #: ../../source/chat.rst:277
@@ -398,7 +397,7 @@ msgid "The context."
 msgstr ""
 
 #: chzzkpy.chat.profile.ActivityBadge:1 of
-msgid "Bases: :py:class:`~chzzkpy.chat.profile.Badge`"
+msgid "상위 클래스: :py:class:`~chzzkpy.chat.profile.Badge`"
 msgstr ""
 
 #: ../../source/chat.rst:300
@@ -407,8 +406,8 @@ msgstr ""
 
 #: ../../source/chat.rst:301
 msgid ""
-"This model is used in the `on_recent_chat` event handler, which contains "
-"the historical messages."
+"이 데이터 모델은 `on_recent_chat` 이벤트 함수에서 사용됩니다."
+"방송인의 채널의 과거 채팅 기록을 담고 있습니다."
 msgstr ""
 
 #: ../../source/chat.rst:310
@@ -417,8 +416,7 @@ msgstr ""
 
 #: ../../source/chat.rst:311
 msgid ""
-"The `Chat Features` exceptions section describes exceptions that can be "
-"thrown by `ChatClient`. Exceptions that occur in the `Basic Features` "
-"exceptions section can also occur."
+"`Chat Features` 페이지에서 발생하는 예외는 `ChatClient`에서 발생할 수 있는 추가적인 예외상황입니다. "
+"`Basic Features` 페이지에서 발생하는 예외도 발생할 수 있습니다. "
 msgstr ""
 
