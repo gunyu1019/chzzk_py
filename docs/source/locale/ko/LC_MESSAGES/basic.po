@@ -1,0 +1,209 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2024, gunyu1019
+# This file is distributed under the same license as the chzzkpy package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: chzzkpy \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-11-14 11:28+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ko\n"
+"Language-Team: ko <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: ../../source/basic.rst:2
+msgid "Basic Feature"
+msgstr ""
+
+#: ../../source/basic.rst:5
+msgid "Client"
+msgstr ""
+
+#: chzzkpy.client.Client:1 of
+msgid "Represents a client to connect Chzzk (Naver Live Streaming)."
+msgstr ""
+
+#: chzzkpy.client.Client.autocomplete:1 of
+msgid "Get a auto-completed keyword."
+msgstr ""
+
+#: ../../source/basic.rst
+msgid "Parameters"
+msgstr ""
+
+#: chzzkpy.client.Client.autocomplete:3 of
+msgid "Incomplete keywords"
+msgstr ""
+
+#: ../../source/basic.rst
+msgid "Returns"
+msgstr ""
+
+#: chzzkpy.client.Client.autocomplete:6 of
+msgid "Autocompleted keywords"
+msgstr ""
+
+#: ../../source/basic.rst
+msgid "Return type"
+msgstr ""
+
+#: chzzkpy.client.Client.close:1 of
+msgid "Closes the connection to chzzk."
+msgstr ""
+
+#: chzzkpy.client.Client.is_closed:1 of
+msgid "Indicates if the session is closed."
+msgstr ""
+
+#: chzzkpy.client.Client.live_detail:1 of
+msgid "Get a live detail info of broadcaster."
+msgstr ""
+
+#: chzzkpy.client.Client.live_detail:3 chzzkpy.client.Client.live_status:3 of
+msgid "The channel ID of broadcaster"
+msgstr ""
+
+#: chzzkpy.client.Client.live_detail:6 of
+msgid ""
+"Return LiveDetail info. Sometimes the broadcaster is not broadcasting, "
+"returns None."
+msgstr ""
+
+#: chzzkpy.client.Client.live_status:1 of
+msgid "Get a live status info of broadcaster."
+msgstr ""
+
+#: chzzkpy.client.Client.live_status:6 of
+msgid ""
+"Return LiveStatus info. Sometimes the broadcaster is not broadcasting, "
+"returns None."
+msgstr ""
+
+#: chzzkpy.client.Client.login:1 of
+msgid "Login at Chzzk. Used for features that require a login. (ex. user method)"
+msgstr ""
+
+#: chzzkpy.client.Client.login:4 of
+msgid "A `NID_AUT` value in the cookie."
+msgstr ""
+
+#: chzzkpy.client.Client.login:6 of
+msgid "A `NID_SES` value in the cookie."
+msgstr ""
+
+#: chzzkpy.client.Client.search_channel:1 of
+msgid "Search the channel with keyword."
+msgstr ""
+
+#: chzzkpy.client.Client.search_channel:3 of
+msgid "A keyword to search channel"
+msgstr ""
+
+#: chzzkpy.client.Client.search_channel:6 of
+msgid "Returns channels with searching."
+msgstr ""
+
+#: chzzkpy.client.Client.search_live:1 of
+msgid "Search the live with keyword."
+msgstr ""
+
+#: chzzkpy.client.Client.search_live:3 of
+msgid "A keyword to search live"
+msgstr ""
+
+#: chzzkpy.client.Client.search_live:6 of
+msgid "Returns lives with searching."
+msgstr ""
+
+#: chzzkpy.client.Client.search_video:1 of
+msgid "Search the video with keyword."
+msgstr ""
+
+#: chzzkpy.client.Client.search_video:3 of
+msgid "A keyword to search video"
+msgstr ""
+
+#: chzzkpy.client.Client.search_video:6 of
+msgid "Returns videos with searching."
+msgstr ""
+
+#: chzzkpy.client.Client.user:1 of
+msgid "Get my user info. This method should be used after login."
+msgstr ""
+
+#: chzzkpy.client.Client.user:4 of
+msgid "Information for logged-in user."
+msgstr ""
+
+#: ../../source/basic.rst:11
+msgid "Channel"
+msgstr ""
+
+#: chzzkpy.channel.Channel:1 of
+msgid "Bases: :py:class:`~chzzkpy.channel.PartialChannel`"
+msgstr ""
+
+#: ../../source/basic.rst:30
+msgid "Search"
+msgstr ""
+
+#: chzzkpy.search.SearchResult:1 of
+msgid "Bases: :py:class:`~chzzkpy.base_model.ChzzkModel`"
+msgstr ""
+
+#: ../../source/basic.rst:43
+msgid "User"
+msgstr ""
+
+#: ../../source/basic.rst:50
+msgid "Video"
+msgstr ""
+
+#: chzzkpy.video.Video:1 of
+msgid "_summary_"
+msgstr ""
+
+#: chzzkpy.video.Video:5 of
+msgid "Whether the video is adult-oriented."
+msgstr ""
+
+#: chzzkpy.video.Video of
+msgid "type"
+msgstr ""
+
+#: chzzkpy.video.Video:7 of
+msgid "bool"
+msgstr ""
+
+#: chzzkpy.video.Video:11 of
+msgid "The video's type"
+msgstr ""
+
+#: chzzkpy.video.Video:13 of
+msgid "Optional[str]"
+msgstr ""
+
+#: ../../source/basic.rst:57
+msgid "Exceptions"
+msgstr ""
+
+#: chzzkpy.error.LoginRequired:1 of
+msgid "Exception that’s raised when a method need login."
+msgstr ""
+
+#: chzzkpy.error.HTTPException:1 of
+msgid "Exception that’s raised when an HTTP request operation fails."
+msgstr ""
+
+#: chzzkpy.error.NotFound:1 of
+msgid "Exception that’s raised for when status code 404 occurs."
+msgstr ""
+
