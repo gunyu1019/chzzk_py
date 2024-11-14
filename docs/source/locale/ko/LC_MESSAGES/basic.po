@@ -20,7 +20,7 @@ msgstr ""
 
 #: ../../source/basic.rst:2
 msgid "Basic Feature"
-msgstr "Basic Feature"
+msgstr "기본 기능"
 
 #: ../../source/basic.rst:5
 msgid "Client"
