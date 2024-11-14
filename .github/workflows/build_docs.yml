@@ -43,18 +43,18 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: docs-ko
-          path: /ko
+          path: ./ko
       - name: Download artifact (language = en)
         uses: actions/download-artifact@v4
         with:
           name: docs-en
-          path: /en
+          path: ./en
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Upload integrated artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: /
+          path: ./
   deploy:
     environment:
       name: github-pages
