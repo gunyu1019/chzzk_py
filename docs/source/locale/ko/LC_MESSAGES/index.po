@@ -10,7 +10,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-11-14 11:28+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Last-Translator: 건유1019 <gunyu1019@gmail.com>\n"
 "Language: ko\n"
 "Language-Team: ko <LL@li.org>\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -20,19 +20,19 @@ msgstr ""
 "Generated-By: Babel 2.16.0\n"
 
 #: ../../source/index.rst:2 ../../source/index.rst:88
-msgid "Introduction"
+msgid "소개"
 msgstr ""
 
 #: ../../source/index.rst:88
-msgid "Basic Feature"
+msgid "기본(검색) 기능"
 msgstr ""
 
 #: ../../source/index.rst:88
-msgid "Chat Feature"
+msgid "채팅 기능"
 msgstr ""
 
 #: ../../source/index.rst:88
-msgid "Table of Contents"
+msgid "목차"
 msgstr ""
 
 #: ../../source/index.rst:3
@@ -44,53 +44,52 @@ msgid "An unofficial python library for Chzzk(Naver Live Streaming Service)."
 msgstr ""
 
 #: ../../source/index.rst:6
-msgid "**Feature**"
+msgid "**기능**"
 msgstr ""
 
 #: ../../source/index.rst:8
-msgid "Chatting in live."
+msgid "치지직 방송 채팅"
 msgstr ""
 
 #: ../../source/index.rst:9
-msgid "Search broadcaster, live, video."
+msgid "영상, 실시간 방송, 채널 검색"
 msgstr ""
 
 #: ../../source/index.rst:10
-msgid "Lookup a live of broadcaster."
+msgid "치지직 실시간 방송 정보"
 msgstr ""
 
 #: ../../source/index.rst:11
-msgid "(WIP) Manage broadcast."
+msgid "(작업 중) 치지직 방송 관리"
 msgstr ""
 
 #: ../../source/index.rst:14
-msgid "Installation"
+msgid "설치"
 msgstr ""
 
 #: ../../source/index.rst:16
-msgid "**Python 3.10 or higher is required.**"
+msgid "**Python 3.10 이상의 버전이 요구됩니다.**"
 msgstr ""
 
 #: ../../source/index.rst:26
-msgid "To install the development version."
+msgid "개발 버전 설치 방법: "
 msgstr ""
 
 #: ../../source/index.rst:35
-msgid "Quick Example"
+msgid "빠른 예제"
 msgstr ""
 
 #: ../../source/index.rst:36
 msgid ""
-"This section is a simple example used in chzzpkpy. You can see more "
-"examples at `Example Repository "
-"<https://github.com/gunyu1019/chzzkpy/tree/main/examples>`__ ."
+"이 섹션은 간단한 예제를 보여줍니다. chzzkpy를 사용한 사례를 보시려면, `이곳 "
+"<https://github.com/gunyu1019/chzzkpy/tree/main/examples>`__ 을 확인해주세요.."
 msgstr ""
 
 #: ../../source/index.rst:40
-msgid "Searching broadcaster"
+msgid "방송인 검색"
 msgstr ""
 
 #: ../../source/index.rst:65
-msgid "Chat Bot"
+msgid "채팅 봇"
 msgstr ""
 
