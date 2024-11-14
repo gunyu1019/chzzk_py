@@ -3,6 +3,8 @@ on:
     branches: 
       - 'docs'  # WIP
 
+name: Document (Build & Deployment)
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -23,7 +25,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install .[docs]
       - name: Build
-        run: sphinx-build './docs/source './docs/build/${{ matrix.language }}' -D language='${{ matrix.language }}' 
+        run: sphinx-build './docs/source' './docs/build/${{ matrix.language }}' -D language='${{ matrix.language }}' 
       - name: Store artifact (language = ${{ matrix.language }})
         uses: actions/upload-artifact@v4
         with:
