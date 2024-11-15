@@ -1,7 +1,7 @@
 on:
   push:
     branches: 
-      - 'docs'  # WIP
+      - 'docs'
 
 name: Document (Build & Deployment)
 
@@ -54,7 +54,7 @@ jobs:
   deploy:
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: '${{ steps.deployment.outputs.page_url }}/ko'
     runs-on: ubuntu-latest
     permissions:
       pages: write
