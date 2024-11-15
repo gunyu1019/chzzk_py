@@ -34,7 +34,7 @@ from ahttp_client.request import RequestCore
 from .base_model import ChzzkModel, Content
 from .channel import Channel
 from .error import LoginRequired, HTTPException, NotFound
-from .manage import ChatAcitivityCount, ProhibitWordResponse, ChatRule, Stream
+from .manage import ChatAcitivityCount, ProhibitWordResponse, ChatRule, Stream, ManageResult, Follower, Subcriber
 from .live import LiveStatus, LiveDetail
 from .search import TopSearchResult
 from .user import ParticleUser, User
@@ -301,14 +301,38 @@ class ChzzkAPISession(ChzzkSession):
         pass
     
     @get_pydantic_response_model()
-    @put("/manage/v1/channels/{channel_id}/users/{target_id}/chat-activity-count", directory_response=True)
+    @get("/manage/v1/channels/{channel_id}/users/{target_id}/chat-activity-count", directory_response=True)
     async def get_chat_activity_count(
         self,
         channel_id: Annotated[str, Path],
         target_id: Annotated[str, Path],
     ) -> Content[ChatAcitivityCount]:
         pass
-
+    
+    @get_pydantic_response_model()
+    @get("/manage/v1/channels/{channel_id}/subscribers", directory_response=True)
+    async def subcribers(
+        self,
+        channel_id: Annotated[str, Path],
+        page: Annotated[int, Query.to_camel()] = 0,
+        size: Annotated[int, Query.to_camel()] = 50,
+        sort_type: Annotated[Optional[Literal['RECENT', 'LONGER']], Query.to_camel()] = 'RECENT',
+        publish_period: Annotated[Optional[Literal['1', '3', '6']], Query.to_camel()] = None,
+        tier: Annotated[Optional[Literal['TIER_1', 'TIER_2']], Query.to_camel()] = None,
+        user_nickname: Annotated[Optional[str], Query.to_camel()] = None
+    ) -> Content[ManageResult[Subcriber]]:
+        pass
+    
+    @get_pydantic_response_model()
+    @get("/manage/v1/channels/{channel_id}/followers", directory_response=True)
+    async def followers(
+        self,
+        channel_id: Annotated[str, Path],
+        page: Annotated[int, Query.to_camel()] = 0,
+        size: Annotated[int, Query.to_camel()] = 50,
+        sort_type: Annotated[Optional[Literal['RECENT', 'LONGER']], Query.to_camel()] = 'RECENT',
+    ) -> Content[ManageResult[Follower]]:
+        pass
 
 class NaverGameAPISession(ChzzkSession):
     def __init__(self, loop: Optional[asyncio.AbstractEventLoop] = None):
