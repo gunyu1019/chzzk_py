@@ -117,6 +117,14 @@ class ChzzkAPISession(ChzzkSession):
     def __init__(self, loop: Optional[asyncio.AbstractEventLoop] = None):
         super().__init__(base_url="https://api.chzzk.naver.com", loop=loop)
 
+        self.temporary_restrict.before_hook(self.query_to_json)
+        self.restrict.before_hook(self.query_to_json)
+        self.set_role.before_hook(self.query_to_json)
+        self.add_prohibit_word.before_hook(self.query_to_json)
+        self.edit_prohibit_word.before_hook(self.query_to_json)
+        self.set_chat_rule.before_hook(self.query_to_json)
+
+
     @get_pydantic_response_model()
     @get("/polling/v2/channels/{channel_id}/live-status", directly_response=True)
     async def live_status(
@@ -259,7 +267,7 @@ class ChzzkAPISession(ChzzkSession):
     
     @get_pydantic_response_model()
     @put("/manage/v1/channels/{channel_id}/chats/prohibit-words/{prohibit_word_number}", directory_response=True)
-    async def edit_prohibit_word_all(
+    async def edit_prohibit_word(
         self,
         channel_id: Annotated[str, Path],
         prohibit_word_number: Annotated[str, Path],
