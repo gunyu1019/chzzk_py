@@ -34,7 +34,7 @@ from ahttp_client.request import RequestCore
 from .base_model import ChzzkModel, Content
 from .channel import Channel
 from .error import LoginRequired, HTTPException, NotFound
-from .manage import ProhibitWordResponse, ChatRule, Stream
+from .manage import ChatAcitivityCount, ProhibitWordResponse, ChatRule, Stream
 from .live import LiveStatus, LiveDetail
 from .search import TopSearchResult
 from .user import ParticleUser, User
@@ -290,6 +290,15 @@ class ChzzkAPISession(ChzzkSession):
         channel_id: Annotated[str, Path],
         rule: Annotated[str, Query.to_camel()]
     ) -> Content[None]:
+        pass
+    
+    @get_pydantic_response_model()
+    @put("/manage/v1/channels/{channel_id}/users/{target_id}/chat-activity-count", directory_response=True)
+    async def get_chat_activity_count(
+        self,
+        channel_id: Annotated[str, Path],
+        target_id: Annotated[str, Path],
+    ) -> Content[ChatAcitivityCount]:
         pass
 
 
