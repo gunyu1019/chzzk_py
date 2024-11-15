@@ -22,10 +22,13 @@ SOFTWARE.
 """
 import datetime
 
-from typing import Optional, Union
+from typing import Generic, TypeVar
 from pydantic import BeforeValidator, Field
 
 from .base_model import ChzzkModel
+from .user import ParticleUser
+
+T = TypeVar('T')
 
 
 class ChatRule(ChzzkModel):
@@ -56,3 +59,29 @@ class ChatAcitivityCount(ChzzkModel):
     restrict_count: int
     temporary_restrict: bool
     temporary_restrict_count: int
+
+
+class ManageResult(ChzzkModel, Generic[T]):
+    page: int
+    size: int
+    total_count: int
+    total_page: int
+    data: T
+
+
+class FollowingInfo(ChzzkModel):
+    following: bool
+    notification: bool
+    follow_date: datetime.datetime
+
+
+class Subcriber(ChzzkModel):  # incomplete data
+    user: ParticleUser
+    following: FollowingInfo
+    channel_following: FollowingInfo
+
+
+class Follower(ChzzkModel):
+    user: ParticleUser
+    following: FollowingInfo
+    channel_following: FollowingInfo
